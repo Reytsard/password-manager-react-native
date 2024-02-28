@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  FlatList,
   ScrollView,
   StyleSheet,
   Text,
@@ -8,10 +9,38 @@ import {
   View,
 } from "react-native";
 import AddCredential from "../components/AddCredential";
+import * as SQLite from "expo-sqlite";
+
+const db = SQLite.openDatabase("credentials.db");
 
 export default function Page() {
-  const [passwords, setPasswords] = useState(sample);
+  const [passwords, setPasswords] = useState([]);
   const [isAddingCredential, setIsAddingCredential] = useState(false);
+  useEffect(() => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS credentials (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL)",
+        [],
+        () => console.log("Table created successfully"),
+        (_, error) => console.error("Error creating table", error)
+      );
+    });
+    fetchCredentials();
+  }, []);
+
+  const fetchCredentials = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM credentials",
+        [],
+        (_, result) => {
+          setPasswords(result.rows._array);
+        },
+        (_, error) => console.error("Error fetching todos", error)
+      );
+    });
+  };
+
   const passwordCards = useMemo(() => {
     return passwords.map((card) => (
       <View key={card.id}>
@@ -22,6 +51,7 @@ export default function Page() {
     ));
   }, [passwords]);
   const addModal = () => {
+    // document.querySelector("#passwordsView").setAttribute("display", "none");
     setIsAddingCredential(!isAddingCredential);
   };
   return (
@@ -31,8 +61,14 @@ export default function Page() {
         <Text>Add Credentials</Text>
       </TouchableHighlight>
       <Text>Passwords</Text>
-      {/* <ScrollView>{passwordCards}</ScrollView> */}
-      {isAddingCredential && <AddCredential />}
+      <ScrollView>{passwordCards}</ScrollView>
+      {isAddingCredential && (
+        <AddCredential
+          passwords={passwords}
+          setPasswords={setPasswords}
+          setIsAddingCredential={setIsAddingCredential}
+        />
+      )}
     </View>
   );
 }

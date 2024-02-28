@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,15 +7,61 @@ import {
   View,
 } from "react-native";
 
-export default function AddCredential() {
+import * as SQLite from "expo-sqlite";
+const db = SQLite.openDatabase("credentials.db");
+
+export default function AddCredential(props) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const addCredential = () => {
+    const credential = {
+      id: props.passwords[props.passwords.length - 1].id + 1,
+      name: name,
+      email: email,
+      password: password,
+    };
+    props.setPasswords([...props.passwords, credential]);
+    handleAddCredentials();
+    props.setIsAddingCredential(false);
+  };
+  const handleAddCredentials = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+        [name, email, password],
+        (_, result) => {
+          console.log(`Todo added with ID: ${result.insertId}`);
+          setName("");
+          setEmail("");
+          setPassword("");
+          fetchTodos();
+        },
+        (_, error) => console.error("Error adding todo", error)
+      );
+    });
+  };
   return (
     <View style={styles.modal}>
       <Text>Add Credentials</Text>
-      <TextInput placeholder="Name" />
-      <TextInput placeholder="Username" />
-      <TextInput secureTextEntry placeholder="Password" />
+      <TextInput
+        placeholder="Name"
+        onChangeText={(e) => setName(e)}
+        value={name}
+      />
+      <TextInput
+        placeholder="Username"
+        onChangeText={(e) => setEmail(e)}
+        value={email}
+      />
+      <TextInput
+        secureTextEntry
+        placeholder="Password"
+        onChangeText={(e) => setPassword(e)}
+        value={password}
+      />
       <View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={addCredential}>
           <Text>Add</Text>
         </TouchableOpacity>
         <TouchableOpacity>
