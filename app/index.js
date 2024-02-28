@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { Redirect, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   Keyboard,
   StyleSheet,
@@ -9,17 +9,41 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import * as FileSystem from "expo-file-system";
 
 export default function Page() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const PASSWORD = "123";
   const router = useRouter();
+  const SAVED_FILE_PATH =
+    FileSystem.documentDirectory +
+    useEffect(() => {
+      checkIfFileExists();
+    }, []);
 
   const verifyPassword = () => {
     if (passwordInput === PASSWORD) {
       setIsLoggedIn(true);
       router.replace("/passwords");
+    }
+  };
+  const createDataBaseFile = async () => {
+    const path = FileSystem.documentDirectory + "PMC.sql";
+    try {
+      await FileSystem.writeAsStringAsync(path, "");
+    } catch (error) {
+      console.error("Error creating file:", error);
+    }
+  };
+  const checkIfFileExists = async () => {
+    const path = FileSystem.documentDirectory + "PMC.sql";
+    const fileInfo = await FileSystem.getInfoAsync(path);
+    if (fileInfo.exists) {
+      //load sqldata in here
+    } else {
+      createDataBaseFile();
+      return <Redirect href={"/createMasterPassword"} />;
     }
   };
   return (
