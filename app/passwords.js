@@ -33,7 +33,9 @@ export default function Page() {
       tx.executeSql(
         "SELECT * FROM credentials",
         [],
-        (_, result) => setTodos(result.rows._array),
+        (_, result) => {
+          setPasswords(result.rows._array);
+        },
         (_, error) => console.error("Error fetching todos", error)
       );
     });
