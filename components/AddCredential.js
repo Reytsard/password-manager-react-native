@@ -35,7 +35,7 @@ export default function AddCredential(props) {
           setName("");
           setEmail("");
           setPassword("");
-          fetchTodos();
+          props.fetchCredentials();
         },
         (_, error) => console.error("Error adding todo", error)
       );

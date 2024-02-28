@@ -67,6 +67,7 @@ export default function Page() {
           passwords={passwords}
           setPasswords={setPasswords}
           setIsAddingCredential={setIsAddingCredential}
+          fetchCredentials={fetchCredentials}
         />
       )}
     </View>
