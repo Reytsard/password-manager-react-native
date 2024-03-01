@@ -1,114 +1,116 @@
-import { Redirect, useRouter } from "expo-router";
+import { router } from "expo-router";
+import { openDatabase } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
-  Keyboard,
   StyleSheet,
   Text,
   TextInput,
+  TouchableHighlight,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
-import * as FileSystem from "expo-file-system";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const db = openDatabase("masterKey.db"); //creates a file named masterKey.db
 
 export default function Page() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [passwordInput, setPasswordInput] = useState("");
-  const PASSWORD = "123";
-  const router = useRouter();
-  const SAVED_FILE_PATH =
-    FileSystem.documentDirectory +
-    useEffect(() => {
-      checkIfFileExists();
-    }, []);
-
-  const verifyPassword = () => {
-    if (passwordInput === PASSWORD) {
-      setIsLoggedIn(true);
-      router.replace("/passwords");
+  const [password, setPassword] = useState("");
+  const [retypePassword, setRetypePassword] = useState("");
+  useEffect(() => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS masterKey (password TEXT NOT NULL)",
+        [],
+        () => console.log("Table masterKey created successfully"),
+        (_, error) => console.error("Error creating table", error)
+      );
+    });
+  }, []);
+  const addMasterPassword = () => {
+    if (
+      retypePassword === password &&
+      retypePassword.length != 0 &&
+      password != 0
+    ) {
+      addMasterKey(password);
+      console.log("password Added");
     }
+    router.replace("/");
   };
-  const createDataBaseFile = async () => {
-    const path = FileSystem.documentDirectory + "PMC.sql";
-    try {
-      await FileSystem.writeAsStringAsync(path, "");
-    } catch (error) {
-      console.error("Error creating file:", error);
-    }
-  };
-  const checkIfFileExists = async () => {
-    const path = FileSystem.documentDirectory + "PMC.sql";
-    const fileInfo = await FileSystem.getInfoAsync(path);
-    if (fileInfo.exists) {
-      //load sqldata in here
-    } else {
-      createDataBaseFile();
-      return <Redirect href={"/createMasterPassword"} />;
-    }
+  const addMasterKey = () => {
+    //try to see if table is not more than length of 1;
+    /**
+     * const updateMainPassword = (newPassword) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      'UPDATE masterKey SET password = ? WHERE id = 1',
+      [newPassword],
+      (_, result) => {
+        if (result.rowsAffected > 0) {
+          console.log('Password updated successfully');
+          // You can perform additional actions here if needed
+        } else {
+          console.warn('No rows updated. Password may not have been found.');
+        }
+      },
+      (_, error) => console.error('Error updating password', error)
+    );
+  });
+};
+     */
+    db.transaction((tx) =>
+      tx.executeSql(
+        "INSERT INTO masterKey (password) VALUES (?)",
+        [password],
+        (_, result) => {
+          console.log(`MainPassword Added: ${result.insertId}`);
+        },
+        (_, error) => console.error("Error adding creds", error)
+      )
+    );
   };
   return (
-    <View style={styles.container}>
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={styles.main}>
-          <Text style={styles.title}>Password Manager</Text>
-          <Text style={styles.subtitle}>Password:</Text>
+    <SafeAreaView style={styles.container}>
+      <View>
+        <Text>Welcome to your own localized Password Manager</Text>
+      </View>
+      <View>
+        <Text>Input Password</Text>
+        <View>
           <TextInput
-            secureTextEntry={true}
-            style={styles.passwordInput}
-            onChangeText={(e) => setPasswordInput(e)}
+            placeholder="password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
           />
-          <TouchableOpacity
-            onPress={verifyPassword}
-            style={styles.buttonContainer}
-          >
-            <Text style={styles.loginButton}>Log In</Text>
-          </TouchableOpacity>
+          <TouchableHighlight>
+            <Text>show Password</Text>
+          </TouchableHighlight>
         </View>
-      </TouchableWithoutFeedback>
-    </View>
+        <View>
+          <Text>Repeat Password</Text>
+          <TextInput
+            placeholder="Repeat Password"
+            secureTextEntry
+            value={retypePassword}
+            onChangeText={setRetypePassword}
+          />
+          <TouchableHighlight>
+            <Text>show Password</Text>
+          </TouchableHighlight>
+        </View>
+      </View>
+      <View>
+        <TouchableOpacity onPress={addMasterPassword}>
+          <Text>Set Master Password</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 24,
-  },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-  },
-  title: {
-    textAlign: "center",
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-    textAlign: "center",
-  },
-  passwordInput: {
-    textAlign: "center",
-    fontSize: 24,
-    height: 36,
-    color: "#FFFFFF",
-    backgroundColor: "#7F7F7F",
-  },
-  loginButton: {
-    height: "36px",
-  },
-  buttonContainer: {
-    marginTop: 20,
-    maxWidth: 960,
-    maxHeight: 80,
-    height: 50,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "cyan",
+    paddingTop: 10,
   },
 });

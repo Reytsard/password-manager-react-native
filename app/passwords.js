@@ -11,7 +11,7 @@ import {
 import AddCredential from "../components/AddCredential";
 import * as SQLite from "expo-sqlite";
 
-const db = SQLite.openDatabase("credentials.db");
+const db = SQLite.openDatabase("Credentials.db");
 
 export default function Page() {
   const [passwords, setPasswords] = useState([]);
@@ -19,15 +19,38 @@ export default function Page() {
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS credentials (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL)",
+        "CREATE TABLE IF NOT EXISTS Credentials (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL)",
         [],
-        () => console.log("Table created successfully"),
+        () => console.log("Table credentials created successfully"),
         (_, error) => console.error("Error creating table", error)
       );
     });
     fetchCredentials();
   }, []);
-
+  const addCredential = () => {
+    const credential = {
+      id: listLength == 0 ? 1 : list[listLength].id + 1,
+      name: name,
+      email: email,
+      password: password,
+    };
+    props.setPasswords([...props.passwords, credential]);
+    props.handleAddCredentials();
+    props.setIsAddingCredential(false);
+  };
+  const handleAddCredentials = (name, email, password) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT INTO Credentials ( name, email, password) VALUES ( ?, ?, ?)",
+        [name, email, password],
+        (_, result) => {
+          console.log(`Todo added with ID: ${result.insertId}`);
+          fetchCredentials();
+        },
+        (_, error) => console.error("Error adding creds", error)
+      );
+    });
+  };
   const fetchCredentials = () => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -36,22 +59,31 @@ export default function Page() {
         (_, result) => {
           setPasswords(result.rows._array);
         },
-        (_, error) => console.error("Error fetching todos", error)
+        (_, error) => console.error("Error fetching credentials", error)
       );
     });
   };
 
   const passwordCards = useMemo(() => {
     return passwords.map((card) => (
-      <View key={card.id}>
-        <Text>{card.name}</Text>
-        <Text>Email: {card.email}</Text>
-        <Text>Password: {card.password}</Text>
+      <View key={card.id} style={styles.card}>
+        <View style={styles.creds}>
+          <Text>{card.name}</Text>
+          <Text>Email: {card.email}</Text>
+          <Text>Password: {card.password}</Text>
+        </View>
+        <View style={styles.cardOptions}>
+          <TouchableHighlight style={styles.cardOption}>
+            <Text>Edit</Text>
+          </TouchableHighlight>
+          <TouchableHighlight style={styles.cardOption}>
+            <Text>Remove</Text>
+          </TouchableHighlight>
+        </View>
       </View>
     ));
   }, [passwords]);
   const addModal = () => {
-    // document.querySelector("#passwordsView").setAttribute("display", "none");
     setIsAddingCredential(!isAddingCredential);
   };
   return (
@@ -68,6 +100,7 @@ export default function Page() {
           setPasswords={setPasswords}
           setIsAddingCredential={setIsAddingCredential}
           fetchCredentials={fetchCredentials}
+          handleAddCredentials={handleAddCredentials}
         />
       )}
     </View>
@@ -75,6 +108,20 @@ export default function Page() {
 }
 
 const styles = StyleSheet.create({
+  creds: {
+    // design remove button and edit to be in one column
+  },
+
+  card: {
+    display: "flex",
+    maxWidth: 920,
+    flexDirection: "row",
+  },
+  cardOptions: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  cardOption: {},
   container: {
     flex: 1,
     alignItems: "center",

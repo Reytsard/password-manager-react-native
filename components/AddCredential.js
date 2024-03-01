@@ -7,39 +7,16 @@ import {
   View,
 } from "react-native";
 
-import * as SQLite from "expo-sqlite";
-const db = SQLite.openDatabase("credentials.db");
-
 export default function AddCredential(props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const addCredential = () => {
-    const credential = {
-      id: props.passwords[props.passwords.length - 1].id + 1,
-      name: name,
-      email: email,
-      password: password,
-    };
-    props.setPasswords([...props.passwords, credential]);
-    handleAddCredentials();
+    props.handleAddCredentials(name, email, password);
+    setName("");
+    setEmail("");
+    setPassword("");
     props.setIsAddingCredential(false);
-  };
-  const handleAddCredentials = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-        [name, email, password],
-        (_, result) => {
-          console.log(`Todo added with ID: ${result.insertId}`);
-          setName("");
-          setEmail("");
-          setPassword("");
-          props.fetchCredentials();
-        },
-        (_, error) => console.error("Error adding todo", error)
-      );
-    });
   };
   return (
     <View style={styles.modal}>
