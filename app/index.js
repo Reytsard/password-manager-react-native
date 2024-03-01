@@ -1,116 +1,160 @@
-import { router } from "expo-router";
-import { openDatabase } from "expo-sqlite";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
-  TouchableHighlight,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-const db = openDatabase("masterKey.db"); //creates a file named masterKey.db
+import { openDatabase } from "expo-sqlite";
+const db = openDatabase("masterKey.db");
 
 export default function Page() {
-  const [password, setPassword] = useState("");
-  const [retypePassword, setRetypePassword] = useState("");
+  const [mainPassword, setMainPassword] = useState("123");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [hasMasterKey, sethasMasterKey] = useState(false); //change this if has already a masterkey
+  const [toSetKey, setToSetKey] = useState("");
+  const router = useRouter();
   useEffect(() => {
-    db.transaction((tx) => {
+    //add method to check if file of masterkey is infile, if not redirect to setupMainPassword
+    db.transaction((tx) =>
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS masterKey (password TEXT NOT NULL)",
         [],
         () => console.log("Table masterKey created successfully"),
         (_, error) => console.error("Error creating table", error)
-      );
-    });
-  }, []);
-  const addMasterPassword = () => {
-    if (
-      retypePassword === password &&
-      retypePassword.length != 0 &&
-      password != 0
-    ) {
-      addMasterKey(password);
-      console.log("password Added");
-    }
-    router.replace("/");
-  };
-  const addMasterKey = () => {
-    //try to see if table is not more than length of 1;
-    /**
-     * const updateMainPassword = (newPassword) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      'UPDATE masterKey SET password = ? WHERE id = 1',
-      [newPassword],
-      (_, result) => {
-        if (result.rowsAffected > 0) {
-          console.log('Password updated successfully');
-          // You can perform additional actions here if needed
-        } else {
-          console.warn('No rows updated. Password may not have been found.');
-        }
-      },
-      (_, error) => console.error('Error updating password', error)
+      )
     );
-  });
-};
-     */
+    fetchPass();
+  }, []);
+
+  const fetchPass = () => {
     db.transaction((tx) =>
       tx.executeSql(
-        "INSERT INTO masterKey (password) VALUES (?)",
-        [password],
+        "SELECT * FROM masterKey",
+        [],
         (_, result) => {
-          console.log(`MainPassword Added: ${result.insertId}`);
+          // setMainPassword(result.rows._array);
+          if (result.rows.length > 0) {
+            sethasMasterKey(true);
+          }
         },
-        (_, error) => console.error("Error adding creds", error)
+        (_, error) => console.error("Error fetching credentials", error)
       )
     );
   };
+
+  const verifyPassword = () => {
+    if (passwordInput == mainPassword) {
+      console.log("passwordInput ", passwordInput);
+      setIsLoggedIn(true);
+      router.replace("/passwords");
+    }
+  };
+
+  const setMasterKey = () => {
+    db.transaction((tx) =>
+      tx.executeSql(
+        "INSERT INTO masterKey(password) VALUES (?)",
+        [toSetKey],
+        (_, result) => {
+          console.log("Password " + toSetKey + " has been set");
+          fetchPass();
+        },
+        (_, error) => console.log(error)
+      )
+    );
+    sethasMasterKey(true);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View>
-        <Text>Welcome to your own localized Password Manager</Text>
-      </View>
-      <View>
-        <Text>Input Password</Text>
-        <View>
-          <TextInput
-            placeholder="password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TouchableHighlight>
-            <Text>show Password</Text>
-          </TouchableHighlight>
+    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={styles.main}>
+          <Text style={styles.title}>Password Manager</Text>
+          {hasMasterKey ? (
+            <View>
+              <Text style={styles.subtitle}>Password:</Text>
+              <TextInput
+                secureTextEntry={true}
+                style={styles.passwordInput}
+                onChangeText={(e) => setPasswordInput(e)}
+                value={passwordInput}
+              />
+              <TouchableOpacity
+                onPress={verifyPassword}
+                style={styles.buttonContainer}
+              >
+                <Text style={styles.loginButton}>Log In</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View>
+              <Text style={styles.subtitle}>Create Master Key:</Text>
+              <TextInput
+                secureTextEntry={true}
+                style={styles.passwordInput}
+                onChangeText={(e) => setToSetKey(e)}
+                value={toSetKey}
+              />
+              <TouchableOpacity
+                onPress={setMasterKey}
+                style={styles.buttonContainer}
+              >
+                <Text style={styles.loginButton}>Set Master Key</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-        <View>
-          <Text>Repeat Password</Text>
-          <TextInput
-            placeholder="Repeat Password"
-            secureTextEntry
-            value={retypePassword}
-            onChangeText={setRetypePassword}
-          />
-          <TouchableHighlight>
-            <Text>show Password</Text>
-          </TouchableHighlight>
-        </View>
-      </View>
-      <View>
-        <TouchableOpacity onPress={addMasterPassword}>
-          <Text>Set Master Password</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      </TouchableWithoutFeedback>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 10,
+    flex: 1,
+    alignItems: "center",
+    padding: 24,
+  },
+  main: {
+    flex: 1,
+    justifyContent: "center",
+    maxWidth: 960,
+    marginHorizontal: "auto",
+  },
+  title: {
+    textAlign: "center",
+    fontSize: 64,
+    fontWeight: "bold",
+  },
+  subtitle: {
+    fontSize: 36,
+    color: "#38434D",
+    textAlign: "center",
+  },
+  passwordInput: {
+    textAlign: "center",
+    fontSize: 24,
+    height: 36,
+    color: "#FFFFFF",
+    backgroundColor: "#7F7F7F",
+  },
+  loginButton: {
+    height: "36px",
+  },
+  buttonContainer: {
+    marginTop: 20,
+    maxWidth: 960,
+    maxHeight: 80,
+    height: 50,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "cyan",
   },
 });

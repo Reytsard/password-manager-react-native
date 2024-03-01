@@ -1,130 +1,116 @@
-import { Redirect, useRouter } from "expo-router";
+import { router } from "expo-router";
+import { openDatabase } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
-  Keyboard,
   StyleSheet,
   Text,
   TextInput,
+  TouchableHighlight,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { openDatabase } from "expo-sqlite";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const db = openDatabase("masterKey.db"); //creates a file named masterKey.db
 
 export default function Page() {
-  const db = openDatabase("masterKey.db");
-
-  const [mainPassword, setMainPassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [passwordInput, setPasswordInput] = useState("");
-  const router = useRouter();
+  const [password, setPassword] = useState("");
+  const [retypePassword, setRetypePassword] = useState("");
   useEffect(() => {
-    //add method to check if file of masterkey is infile, if not redirect to setupMainPassword
-    checkMasterKeyTable();
+    db.transaction((tx) => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS masterKey (password TEXT NOT NULL)",
+        [],
+        () => console.log("Table masterKey created successfully"),
+        (_, error) => console.error("Error creating table", error)
+      );
+    });
   }, []);
-  const checkMasterKeyTable = () => {
-    db.transaction((tx) =>
-      tx.executeSql(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name='masterKey'",
-        [],
-        (_, result) => {
-          const tableExists = result.rows.length > 0;
-          if (tableExists) {
-            fetchPass(); // Table exists, proceed with fetching password
-          } else {
-            // Table doesn't exist, navigate to the firstTimeUser screen
-            router.replace("//");
-          }
-        },
-        (_, error) => console.error("Error checking masterKey table", error)
-      )
-    );
-  };
-
-  const fetchPass = () => {
-    db.transaction((tx) =>
-      tx.executeSql(
-        "SELECT * FROM masterKey LIMIT 1",
-        [],
-        (_, result) => {
-          setMainPassword(result.rows._array);
-        },
-        (_, error) => console.error("Error fetching credentials", error)
-      )
-    );
-  };
-
-  const verifyPassword = () => {
-    if (passwordInput == mainPassword) {
-      console.log("passwordInput ", passwordInput);
-      setIsLoggedIn(true);
-      router.replace("/passwords");
+  const addMasterPassword = () => {
+    if (
+      retypePassword === password &&
+      retypePassword.length != 0 &&
+      password != 0
+    ) {
+      addMasterKey(password);
+      console.log("password Added");
     }
+    router.replace("/");
   };
-
+  const addMasterKey = () => {
+    //try to see if table is not more than length of 1;
+    /**
+     * const updateMainPassword = (newPassword) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      'UPDATE masterKey SET password = ? WHERE id = 1',
+      [newPassword],
+      (_, result) => {
+        if (result.rowsAffected > 0) {
+          console.log('Password updated successfully');
+          // You can perform additional actions here if needed
+        } else {
+          console.warn('No rows updated. Password may not have been found.');
+        }
+      },
+      (_, error) => console.error('Error updating password', error)
+    );
+  });
+};
+     */
+    db.transaction((tx) =>
+      tx.executeSql(
+        "INSERT INTO masterKey (password) VALUES (?)",
+        [password],
+        (_, result) => {
+          console.log(`MainPassword Added: ${result.insertId}`);
+        },
+        (_, error) => console.error("Error adding creds", error)
+      )
+    );
+  };
   return (
-    <View style={styles.container}>
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={styles.main}>
-          <Text style={styles.title}>Password Manager</Text>
-          <Text style={styles.subtitle}>Password:</Text>
+    <SafeAreaView style={styles.container}>
+      <View>
+        <Text>Welcome to your own localized Password Manager</Text>
+      </View>
+      <View>
+        <Text>Input Password</Text>
+        <View>
           <TextInput
-            secureTextEntry={true}
-            style={styles.passwordInput}
-            onChangeText={(e) => setPasswordInput(e)}
+            placeholder="password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
           />
-          <TouchableOpacity
-            onPress={verifyPassword}
-            style={styles.buttonContainer}
-          >
-            <Text style={styles.loginButton}>Log In</Text>
-          </TouchableOpacity>
+          <TouchableHighlight>
+            <Text>show Password</Text>
+          </TouchableHighlight>
         </View>
-      </TouchableWithoutFeedback>
-    </View>
+        <View>
+          <Text>Repeat Password</Text>
+          <TextInput
+            placeholder="Repeat Password"
+            secureTextEntry
+            value={retypePassword}
+            onChangeText={setRetypePassword}
+          />
+          <TouchableHighlight>
+            <Text>show Password</Text>
+          </TouchableHighlight>
+        </View>
+      </View>
+      <View>
+        <TouchableOpacity onPress={addMasterPassword}>
+          <Text>Set Master Password</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: "center",
-    padding: 24,
-  },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-  },
-  title: {
-    textAlign: "center",
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-    textAlign: "center",
-  },
-  passwordInput: {
-    textAlign: "center",
-    fontSize: 24,
-    height: 36,
-    color: "#FFFFFF",
-    backgroundColor: "#7F7F7F",
-  },
-  loginButton: {
-    height: "36px",
-  },
-  buttonContainer: {
-    marginTop: 20,
-    maxWidth: 960,
-    maxHeight: 80,
-    height: 50,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "cyan",
+    paddingTop: 10,
   },
 });

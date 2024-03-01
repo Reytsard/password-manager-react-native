@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableHighlight,
   View,
 } from "react-native";
@@ -21,30 +22,21 @@ export default function Page() {
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS Credentials (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL)",
         [],
-        () => console.log("Table credentials created successfully"),
-        (_, error) => console.error("Error creating table", error)
+        () => {},
+        (_, error) => {
+          ToastAndroid.show("Error locating save file", ToastAndroid.SHORT);
+        }
       );
     });
     fetchCredentials();
   }, []);
-  const addCredential = () => {
-    const credential = {
-      id: listLength == 0 ? 1 : list[listLength].id + 1,
-      name: name,
-      email: email,
-      password: password,
-    };
-    props.setPasswords([...props.passwords, credential]);
-    props.handleAddCredentials();
-    props.setIsAddingCredential(false);
-  };
+
   const handleAddCredentials = (name, email, password) => {
     db.transaction((tx) => {
       tx.executeSql(
         "INSERT INTO Credentials ( name, email, password) VALUES ( ?, ?, ?)",
         [name, email, password],
         (_, result) => {
-          console.log(`Todo added with ID: ${result.insertId}`);
           fetchCredentials();
         },
         (_, error) => console.error("Error adding creds", error)
@@ -144,126 +136,3 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
-
-const sample = [
-  {
-    id: 4,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 5,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 1,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 3,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 2,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 6,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 7,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 8,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 9,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 10,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 11,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 12,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 13,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 14,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 15,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 16,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 17,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 18,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 19,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 20,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-];
