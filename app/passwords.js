@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import AddCredential from "../components/AddCredential";
 import * as SQLite from "expo-sqlite";
+import Card from "../components/Card";
 
 const db = SQLite.openDatabase("Credentials.db");
 
@@ -55,29 +56,19 @@ export default function Page() {
       );
     });
   };
-
-  const passwordCards = useMemo(() => {
-    return passwords.map((card) => (
-      <View key={card.id} style={styles.card}>
-        <View style={styles.creds}>
-          <Text>{card.name}</Text>
-          <Text>Email: {card.email}</Text>
-          <Text>Password: {card.password}</Text>
-        </View>
-        <View style={styles.cardOptions}>
-          <TouchableHighlight style={styles.cardOption}>
-            <Text>Edit</Text>
-          </TouchableHighlight>
-          <TouchableHighlight style={styles.cardOption}>
-            <Text>Remove</Text>
-          </TouchableHighlight>
-        </View>
-      </View>
-    ));
-  }, [passwords]);
+  const removeCreds = (card) => {
+    const cards = passwords.filter((item) => item.id != card.id);
+    setPasswords(cards);
+  };
   const addModal = () => {
     setIsAddingCredential(!isAddingCredential);
   };
+  const passwordCards = useMemo(() => {
+    return passwords.map((card) => (
+      <Card card={card} removeCreds={() => removeCreds(card)} />
+    ));
+  }, [passwords]);
+
   return (
     <View style={styles.container}>
       <TextInput placeholder="search" />
@@ -85,7 +76,7 @@ export default function Page() {
         <Text>Add Credentials</Text>
       </TouchableHighlight>
       <Text>Passwords</Text>
-      <ScrollView>{passwordCards}</ScrollView>
+      <ScrollView style={styles.scrollView}>{passwordCards}</ScrollView>
       {isAddingCredential && (
         <AddCredential
           passwords={passwords}
@@ -103,17 +94,11 @@ const styles = StyleSheet.create({
   creds: {
     // design remove button and edit to be in one column
   },
-
-  card: {
-    display: "flex",
-    maxWidth: 920,
-    flexDirection: "row",
+  scrollView: {
+    width: "100%",
+    paddingLeft: 10,
+    paddingRight: 10,
   },
-  cardOptions: {
-    display: "flex",
-    flexDirection: "row",
-  },
-  cardOption: {},
   container: {
     flex: 1,
     alignItems: "center",
@@ -122,8 +107,8 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     justifyContent: "center",
-    maxWidth: 960,
     marginHorizontal: "auto",
+    width: "auto",
   },
   addPasswordButton: {
     display: "flex",
