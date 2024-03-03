@@ -18,6 +18,7 @@ const db = SQLite.openDatabase("Credentials.db");
 export default function Page() {
   const [passwords, setPasswords] = useState([]);
   const [isAddingCredential, setIsAddingCredential] = useState(false);
+  const [keyword, setKeyword] = useState("");
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -60,6 +61,7 @@ export default function Page() {
     const cards = passwords.filter((item) => item.id != card.id);
     setPasswords(cards);
   };
+
   const addModal = () => {
     setIsAddingCredential(!isAddingCredential);
   };
@@ -69,13 +71,25 @@ export default function Page() {
     ));
   }, [passwords]);
 
+  const searchHandler = () => {
+    if (!keyword) {
+      //set to hide all
+    } else {
+      //HIDE ALL then show filtered list
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <TextInput placeholder="search" />
+      <TextInput
+        style={styles.searchbar}
+        placeholder="search"
+        onChangeText={() => searchHandler(keyword, passwords)}
+      />
       <TouchableHighlight style={styles.addPasswordButton} onPress={addModal}>
         <Text>Add Credentials</Text>
       </TouchableHighlight>
-      <Text>Passwords</Text>
+      <Text style={styles.header}>Credentials</Text>
       <ScrollView style={styles.scrollView}>{passwordCards}</ScrollView>
       {isAddingCredential && (
         <AddCredential
@@ -91,6 +105,23 @@ export default function Page() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    fontSize: 32,
+    fontWeight: "800",
+  },
+  searchbar: {
+    borderWidth: 1,
+    borderRadius: 12,
+    width: "100%",
+    minHeight: 32,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    marginTop: 10,
+    marginBottom: 5,
+  },
+
   creds: {
     // design remove button and edit to be in one column
   },
