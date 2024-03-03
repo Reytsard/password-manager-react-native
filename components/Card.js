@@ -32,7 +32,7 @@ function Card({ card, removeCreds }) {
     <View key={card.id} style={styles.card}>
       <View style={styles.creds}>
         <Text style={styles.textTitle}>{card.name}</Text>
-        <Text>Email: {card.email}</Text>
+        <Text>Username: {card.email}</Text>
         <Text>Password: {card.password}</Text>
       </View>
       <View style={styles.cardOptions}>
@@ -55,6 +55,9 @@ export default Card;
 const styles = StyleSheet.create({
   textTitle: { fontSize: 24, fontWeight: "800" },
   card: {
+    borderWidth: 2,
+    borderRadius: 10,
+    padding: 5,
     marginTop: 10,
     display: "flex",
     width: "100%",
