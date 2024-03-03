@@ -2,6 +2,7 @@ import { openDatabase } from "expo-sqlite";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
 import * as SQLite from "expo-sqlite";
+import { router } from "expo-router";
 
 const db = SQLite.openDatabase("Credentials.db");
 
@@ -28,6 +29,9 @@ function Card({ card, removeCreds }) {
     deleteTuple(card.id);
   };
   //todo create those touchable to route to another place
+  const editHandler = (id) => {
+    router.replace("/cred/" + id);
+  };
   return (
     <View key={card.id} style={styles.card}>
       <View style={styles.creds}>
@@ -36,7 +40,10 @@ function Card({ card, removeCreds }) {
         <Text>Password: {card.password}</Text>
       </View>
       <View style={styles.cardOptions}>
-        <TouchableHighlight style={styles.cardOption}>
+        <TouchableHighlight
+          style={styles.cardOption}
+          onPress={() => editHandler(card.id)}
+        >
           <Text>Edit</Text>
         </TouchableHighlight>
         <TouchableHighlight
@@ -77,7 +84,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 40,
     width: 65,
-    backgroundColor: "gray",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
     borderRadius: 10,
   },
 });

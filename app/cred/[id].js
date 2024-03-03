@@ -1,10 +1,16 @@
+import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, TouchableHighlight, View } from "react-native";
 
 function editCred() {
+  //todo: create a verification that they will change it
+  const { id } = useLocalSearchParams();
   return (
     <View>
-      <Text>editCred</Text>
+      <Text>ID: {id}</Text>
+      <TouchableHighlight>
+        <Text onPress={() => router.replace("/passwords")}>Back</Text>
+      </TouchableHighlight>
     </View>
   );
 }
