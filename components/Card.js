@@ -1,7 +1,32 @@
-import React from "react";
+import { openDatabase } from "expo-sqlite";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import * as SQLite from "expo-sqlite";
+
+const db = SQLite.openDatabase("Credentials.db");
 
 function Card({ card, removeCreds }) {
+  const deleteTuple = (tupleId) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DELETE FROM credentials WHERE id = ?",
+        [tupleId],
+        (_, result) => {
+          if (result.rowsAffected > 0) {
+            console.log("Tuple deleted successfully");
+            // You can perform additional actions here if needed
+            removeCreds();
+          } else {
+            console.warn("No rows deleted. Tuple may not have been found.");
+          }
+        },
+        (_, error) => console.error("Error deleting tuple", error)
+      );
+    });
+  };
+  const removeCardHandler = () => {
+    deleteTuple(card.id);
+  };
   //todo create those touchable to route to another place
   return (
     <View key={card.id} style={styles.card}>
@@ -14,7 +39,10 @@ function Card({ card, removeCreds }) {
         <TouchableHighlight style={styles.cardOption}>
           <Text>Edit</Text>
         </TouchableHighlight>
-        <TouchableHighlight style={styles.cardOption} onPress={removeCreds}>
+        <TouchableHighlight
+          style={styles.cardOption}
+          onPress={removeCardHandler}
+        >
           <Text>Remove</Text>
         </TouchableHighlight>
       </View>

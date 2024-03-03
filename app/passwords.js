@@ -60,6 +60,7 @@ export default function Page() {
     const cards = passwords.filter((item) => item.id != card.id);
     setPasswords(cards);
   };
+
   const addModal = () => {
     setIsAddingCredential(!isAddingCredential);
   };
