@@ -5,29 +5,48 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableHighlight,
   View,
 } from "react-native";
 import AddCredential from "../components/AddCredential";
 import * as SQLite from "expo-sqlite";
+import Card from "../components/Card";
+import { router } from "expo-router";
 
-const db = SQLite.openDatabase("credentials.db");
+const db = SQLite.openDatabase("Credentials.db");
 
 export default function Page() {
   const [passwords, setPasswords] = useState([]);
   const [isAddingCredential, setIsAddingCredential] = useState(false);
+  const [hasKeyword, setHasKeyword] = useState(false);
+  const [searchList, setSearchList] = useState([]);
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS credentials (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL)",
+        "CREATE TABLE IF NOT EXISTS Credentials (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL)",
         [],
-        () => console.log("Table created successfully"),
-        (_, error) => console.error("Error creating table", error)
+        () => {},
+        (_, error) => {
+          ToastAndroid.show("Error locating save file", ToastAndroid.SHORT);
+        }
       );
     });
     fetchCredentials();
   }, []);
 
+  const handleAddCredentials = (name, email, password) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT INTO Credentials ( name, email, password) VALUES ( ?, ?, ?)",
+        [name, email, password],
+        (_, result) => {
+          fetchCredentials();
+        },
+        (_, error) => console.error("Error adding creds", error)
+      );
+    });
+  };
   const fetchCredentials = () => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -36,45 +55,113 @@ export default function Page() {
         (_, result) => {
           setPasswords(result.rows._array);
         },
-        (_, error) => console.error("Error fetching todos", error)
+        (_, error) => console.error("Error fetching credentials", error)
       );
     });
   };
+  const removeCreds = (card) => {
+    const cards = passwords.filter((item) => item.id != card.id);
+    setPasswords(cards);
+  };
 
-  const passwordCards = useMemo(() => {
-    return passwords.map((card) => (
-      <View key={card.id}>
-        <Text>{card.name}</Text>
-        <Text>Email: {card.email}</Text>
-        <Text>Password: {card.password}</Text>
-      </View>
-    ));
-  }, [passwords]);
   const addModal = () => {
-    // document.querySelector("#passwordsView").setAttribute("display", "none");
     setIsAddingCredential(!isAddingCredential);
   };
+  const passwordCards = useMemo(() => {
+    return passwords.map((card) => (
+      <Card card={card} removeCreds={() => removeCreds(card)} key={card.id} />
+    ));
+  }, [passwords]);
+
+  const searchHandler = (keyword, passwords) => {
+    if (!keyword) {
+      setHasKeyword(false);
+      setSearchList([]);
+    } else {
+      setHasKeyword(true);
+      const newList = passwords.filter((item) =>
+        item.name.toLowerCase().includes(keyword.toLowerCase())
+      );
+      setSearchList(newList);
+    }
+  };
+  const searchListCards = useMemo(() => {
+    return searchList.map((card) => (
+      <Card card={card} removeCreds={() => removeCreds(card)} key={card.id} />
+    ));
+  }, [searchList]);
   return (
     <View style={styles.container}>
-      <TextInput placeholder="search" />
-      <TouchableHighlight style={styles.addPasswordButton} onPress={addModal}>
-        <Text>Add Credentials</Text>
-      </TouchableHighlight>
-      <Text>Passwords</Text>
-      <ScrollView>{passwordCards}</ScrollView>
+      <TextInput
+        style={styles.searchbar}
+        placeholder="search"
+        onChangeText={(e) => {
+          searchHandler(e, passwords);
+        }}
+      />
+
+      <Text style={styles.header}>Credentials</Text>
+
+      <ScrollView style={styles.scrollView}>
+        {!hasKeyword ? passwordCards : searchListCards}
+      </ScrollView>
+
       {isAddingCredential && (
         <AddCredential
           passwords={passwords}
           setPasswords={setPasswords}
           setIsAddingCredential={setIsAddingCredential}
           fetchCredentials={fetchCredentials}
+          handleAddCredentials={handleAddCredentials}
         />
       )}
+      <View style={styles.optionBar}>
+        <TouchableHighlight style={styles.addPasswordButton} onPress={addModal}>
+          <Text style={{ fontWeight: "800" }}>Add Credentials</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={styles.settingButton}
+          onPress={() => router.replace("/setting")}
+        >
+          <Text style={{ fontWeight: "800" }}>Settings</Text>
+        </TouchableHighlight>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  optionBar: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  header: {
+    fontSize: 32,
+    fontWeight: "800",
+  },
+  searchbar: {
+    borderWidth: 1,
+    borderRadius: 12,
+    width: "100%",
+    minHeight: 32,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  scrollView: {
+    width: "100%",
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
   container: {
     flex: 1,
     alignItems: "center",
@@ -83,140 +170,27 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     justifyContent: "center",
-    maxWidth: 960,
     marginHorizontal: "auto",
+    width: "auto",
   },
   addPasswordButton: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     maxWidth: 960,
-    height: 40,
-    width: "100%",
-    backgroundColor: "gray",
-    borderRadius: 10,
+    height: 45,
+    width: "50%",
+    borderWidth: 1,
+    borderTopLeftRadius: 10,
+  },
+  settingButton: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    maxWidth: 960,
+    height: 45,
+    width: "50%",
+    borderWidth: 1,
+    borderTopRightRadius: 10,
   },
 });
-
-const sample = [
-  {
-    id: 4,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 5,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 1,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 3,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 2,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 6,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 7,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 8,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 9,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 10,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 11,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 12,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 13,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 14,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 15,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 16,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 17,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 18,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 19,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-  {
-    id: 20,
-    name: "Valorant 1",
-    email: "myppsmollikeurs",
-    password: "AsdfhjlkZxcvbnm0001",
-  },
-];

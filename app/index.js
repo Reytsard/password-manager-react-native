@@ -1,4 +1,4 @@
-import { Redirect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Keyboard,
@@ -9,60 +9,105 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import * as FileSystem from "expo-file-system";
+import { openDatabase } from "expo-sqlite";
+const db = openDatabase("masterKey.db");
 
 export default function Page() {
+  const [mainPassword, setMainPassword] = useState(""); //to set UP !!!!!!!!!!!!!!!!!!!!!!!!!
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
-  const PASSWORD = "123";
+  const [hasMasterKey, sethasMasterKey] = useState(false); //change this if has already a masterkey
+  const [toSetKey, setToSetKey] = useState("");
   const router = useRouter();
-  const SAVED_FILE_PATH =
-    FileSystem.documentDirectory +
-    useEffect(() => {
-      checkIfFileExists();
-    }, []);
+  useEffect(() => {
+    //add method to check if file of masterkey is infile, if not redirect to setupMainPassword
+    db.transaction((tx) =>
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS masterKey (password TEXT NOT NULL)",
+        [],
+        () => console.log("Table masterKey created successfully"),
+        (_, error) => console.error("Error creating table", error)
+      )
+    );
+    fetchPass();
+  }, []);
+
+  const fetchPass = () => {
+    db.transaction((tx) =>
+      tx.executeSql(
+        "SELECT * FROM masterKey",
+        [],
+        (_, result) => {
+          if (result.rows.length > 0) {
+            sethasMasterKey(true);
+            const pass = result.rows._array[0];
+            setMainPassword(pass.password);
+          }
+        },
+        (_, error) => console.error("Error fetching credentials", error)
+      )
+    );
+  };
 
   const verifyPassword = () => {
-    if (passwordInput === PASSWORD) {
+    if (passwordInput == mainPassword) {
       setIsLoggedIn(true);
       router.replace("/passwords");
     }
   };
-  const createDataBaseFile = async () => {
-    const path = FileSystem.documentDirectory + "PMC.sql";
-    try {
-      await FileSystem.writeAsStringAsync(path, "");
-    } catch (error) {
-      console.error("Error creating file:", error);
-    }
+
+  const setMasterKey = () => {
+    db.transaction((tx) =>
+      tx.executeSql(
+        "INSERT INTO masterKey(password) VALUES (?)",
+        [toSetKey],
+        (_, result) => {
+          fetchPass();
+        },
+        (_, error) => console.log(error)
+      )
+    );
+    sethasMasterKey(true);
   };
-  const checkIfFileExists = async () => {
-    const path = FileSystem.documentDirectory + "PMC.sql";
-    const fileInfo = await FileSystem.getInfoAsync(path);
-    if (fileInfo.exists) {
-      //load sqldata in here
-    } else {
-      createDataBaseFile();
-      return <Redirect href={"/createMasterPassword"} />;
-    }
-  };
+
   return (
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={styles.main}>
           <Text style={styles.title}>Password Manager</Text>
-          <Text style={styles.subtitle}>Password:</Text>
-          <TextInput
-            secureTextEntry={true}
-            style={styles.passwordInput}
-            onChangeText={(e) => setPasswordInput(e)}
-          />
-          <TouchableOpacity
-            onPress={verifyPassword}
-            style={styles.buttonContainer}
-          >
-            <Text style={styles.loginButton}>Log In</Text>
-          </TouchableOpacity>
+          {hasMasterKey ? (
+            <View>
+              <Text style={styles.subtitle}>Password:</Text>
+              <TextInput
+                secureTextEntry={true}
+                style={styles.passwordInput}
+                onChangeText={(e) => setPasswordInput(e)}
+                value={passwordInput}
+              />
+              <TouchableOpacity
+                onPress={verifyPassword}
+                style={styles.buttonContainer}
+              >
+                <Text style={styles.loginButton}>Log In</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View>
+              <Text style={styles.subtitle}>Create Master Key:</Text>
+              <TextInput
+                secureTextEntry={true}
+                style={styles.passwordInput}
+                onChangeText={(e) => setToSetKey(e)}
+                value={toSetKey}
+              />
+              <TouchableOpacity
+                onPress={setMasterKey}
+                style={styles.buttonContainer}
+              >
+                <Text style={styles.loginButton}>Set Master Key</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </TouchableWithoutFeedback>
     </View>
