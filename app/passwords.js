@@ -78,9 +78,10 @@ export default function Page() {
       setSearchList([]);
     } else {
       setHasKeyword(true);
-      const newList = passwords.filter((item) => item.name.includes(keyword));
+      const newList = passwords.filter((item) =>
+        item.name.toLowerCase().includes(keyword.toLowerCase())
+      );
       setSearchList(newList);
-      console.log(newList);
     }
   };
   const searchListCards = useMemo(() => {

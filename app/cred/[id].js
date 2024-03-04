@@ -41,6 +41,9 @@ function editCred() {
       </TouchableHighlight>
     </View>
   );
+
+  //!!!!!!!!!!!!!!!!!!!!!!!! TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //create a function that will show a modal that will ask if they want to change
 }
 
 export default editCred;
