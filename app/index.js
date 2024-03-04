@@ -13,7 +13,7 @@ import { openDatabase } from "expo-sqlite";
 const db = openDatabase("masterKey.db");
 
 export default function Page() {
-  const [mainPassword, setMainPassword] = useState("123");
+  const [mainPassword, setMainPassword] = useState(""); //to set UP !!!!!!!!!!!!!!!!!!!!!!!!!
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [hasMasterKey, sethasMasterKey] = useState(false); //change this if has already a masterkey
@@ -38,7 +38,6 @@ export default function Page() {
         "SELECT * FROM masterKey",
         [],
         (_, result) => {
-          // setMainPassword(result.rows._array);
           if (result.rows.length > 0) {
             sethasMasterKey(true);
           }
@@ -62,7 +61,6 @@ export default function Page() {
         "INSERT INTO masterKey(password) VALUES (?)",
         [toSetKey],
         (_, result) => {
-          console.log("Password " + toSetKey + " has been set");
           fetchPass();
         },
         (_, error) => console.log(error)

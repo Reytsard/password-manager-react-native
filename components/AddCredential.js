@@ -18,30 +18,39 @@ export default function AddCredential(props) {
     setPassword("");
     props.setIsAddingCredential(false);
   };
+  const cancelHandler = () => {
+    setName("");
+    setEmail("");
+    setPassword("");
+    props.setIsAddingCredential(false);
+  };
   return (
     <View style={styles.modal}>
-      <Text>Add Credentials</Text>
+      <Text style={styles.header}>Add Credentials</Text>
       <TextInput
         placeholder="Name"
         onChangeText={(e) => setName(e)}
         value={name}
+        style={styles.input}
       />
       <TextInput
         placeholder="Username"
         onChangeText={(e) => setEmail(e)}
         value={email}
+        style={styles.input}
       />
       <TextInput
         secureTextEntry
         placeholder="Password"
         onChangeText={(e) => setPassword(e)}
         value={password}
+        style={styles.input}
       />
-      <View>
-        <TouchableOpacity onPress={addCredential}>
+      <View style={styles.options}>
+        <TouchableOpacity onPress={addCredential} style={styles.button}>
           <Text>Add</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={cancelHandler} style={styles.button}>
           <Text>Cancel</Text>
         </TouchableOpacity>
       </View>
@@ -55,5 +64,35 @@ const styles = StyleSheet.create({
     maxWidth: 920,
     height: 300,
     width: "100%",
+  },
+  header: {
+    textAlign: "center",
+    fontSize: 26,
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 5,
+    marginTop: 5,
+    height: 50,
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  options: {
+    marginTop: 10,
+    height: 50,
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+  },
+  button: {
+    height: 50,
+    width: 80,
+    borderWidth: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 40,
   },
 });

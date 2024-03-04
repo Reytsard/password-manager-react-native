@@ -12,6 +12,7 @@ import {
 import AddCredential from "../components/AddCredential";
 import * as SQLite from "expo-sqlite";
 import Card from "../components/Card";
+import { router } from "expo-router";
 
 const db = SQLite.openDatabase("Credentials.db");
 
@@ -78,9 +79,10 @@ export default function Page() {
       setSearchList([]);
     } else {
       setHasKeyword(true);
-      const newList = passwords.filter((item) => item.name.includes(keyword));
+      const newList = passwords.filter((item) =>
+        item.name.toLowerCase().includes(keyword.toLowerCase())
+      );
       setSearchList(newList);
-      console.log(newList);
     }
   };
   const searchListCards = useMemo(() => {
@@ -97,9 +99,7 @@ export default function Page() {
           searchHandler(e, passwords);
         }}
       />
-      <TouchableHighlight style={styles.addPasswordButton} onPress={addModal}>
-        <Text>Add Credentials</Text>
-      </TouchableHighlight>
+
       <Text style={styles.header}>Credentials</Text>
 
       <ScrollView style={styles.scrollView}>
@@ -115,11 +115,32 @@ export default function Page() {
           handleAddCredentials={handleAddCredentials}
         />
       )}
+      <View style={styles.optionBar}>
+        <TouchableHighlight style={styles.addPasswordButton} onPress={addModal}>
+          <Text>Add Credentials</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={styles.addPasswordButton}
+          onPress={() => router.replace("/setting")}
+        >
+          <Text>Settings</Text>
+        </TouchableHighlight>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  optionBar: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
   header: {
     fontSize: 32,
     fontWeight: "800",
@@ -162,7 +183,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     maxWidth: 960,
     height: 40,
-    width: "100%",
+    width: "50%",
     backgroundColor: "gray",
     borderRadius: 10,
   },
