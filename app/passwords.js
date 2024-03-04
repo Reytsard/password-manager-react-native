@@ -18,7 +18,8 @@ const db = SQLite.openDatabase("Credentials.db");
 export default function Page() {
   const [passwords, setPasswords] = useState([]);
   const [isAddingCredential, setIsAddingCredential] = useState(false);
-  const [keyword, setKeyword] = useState("");
+  const [hasKeyword, setHasKeyword] = useState(false);
+  const [searchList, setSearchList] = useState([]);
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -67,30 +68,44 @@ export default function Page() {
   };
   const passwordCards = useMemo(() => {
     return passwords.map((card) => (
-      <Card card={card} removeCreds={() => removeCreds(card)} />
+      <Card card={card} removeCreds={() => removeCreds(card)} key={card.id} />
     ));
   }, [passwords]);
 
-  const searchHandler = () => {
+  const searchHandler = (keyword, passwords) => {
     if (!keyword) {
-      //set to hide all
+      setHasKeyword(false);
+      setSearchList([]);
     } else {
-      //HIDE ALL then show filtered list
+      setHasKeyword(true);
+      const newList = passwords.filter((item) => item.name.includes(keyword));
+      setSearchList(newList);
+      console.log(newList);
     }
   };
-
+  const searchListCards = useMemo(() => {
+    return searchList.map((card) => (
+      <Card card={card} removeCreds={() => removeCreds(card)} key={card.id} />
+    ));
+  }, [searchList]);
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.searchbar}
         placeholder="search"
-        onChangeText={() => searchHandler(keyword, passwords)}
+        onChangeText={(e) => {
+          searchHandler(e, passwords);
+        }}
       />
       <TouchableHighlight style={styles.addPasswordButton} onPress={addModal}>
         <Text>Add Credentials</Text>
       </TouchableHighlight>
       <Text style={styles.header}>Credentials</Text>
-      <ScrollView style={styles.scrollView}>{passwordCards}</ScrollView>
+
+      <ScrollView style={styles.scrollView}>
+        {!hasKeyword ? passwordCards : searchListCards}
+      </ScrollView>
+
       {isAddingCredential && (
         <AddCredential
           passwords={passwords}
