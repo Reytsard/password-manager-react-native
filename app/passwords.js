@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  FlatList,
   ScrollView,
   StyleSheet,
   Text,
@@ -99,13 +98,10 @@ export default function Page() {
           searchHandler(e, passwords);
         }}
       />
-
       <Text style={styles.header}>Credentials</Text>
-
       <ScrollView style={styles.scrollView}>
         {!hasKeyword ? passwordCards : searchListCards}
       </ScrollView>
-
       {isAddingCredential && (
         <AddCredential
           passwords={passwords}
@@ -115,17 +111,22 @@ export default function Page() {
           handleAddCredentials={handleAddCredentials}
         />
       )}
-      <View style={styles.optionBar}>
-        <TouchableHighlight style={styles.addPasswordButton} onPress={addModal}>
-          <Text style={{ fontWeight: "800" }}>Add Credentials</Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style={styles.settingButton}
-          onPress={() => router.replace("/setting")}
-        >
-          <Text style={{ fontWeight: "800" }}>Settings</Text>
-        </TouchableHighlight>
-      </View>
+      {!isAddingCredential && (
+        <View style={styles.optionBar} id="bottomOptions">
+          <TouchableHighlight
+            style={styles.addPasswordButton}
+            onPress={addModal}
+          >
+            <Text style={{ fontWeight: "800" }}>Add Credentials</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={styles.settingButton}
+            onPress={() => router.replace("/setting")}
+          >
+            <Text style={{ fontWeight: "800" }}>Settings</Text>
+          </TouchableHighlight>
+        </View>
+      )}
     </View>
   );
 }
