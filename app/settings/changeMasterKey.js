@@ -121,9 +121,7 @@ export default function Page() {
         </TouchableOpacity>
       ) : (
         <View style={styles.passwordChanged}>
-          <Text style={styles.passwordChangedText}>
-            Changing Of Master key is successful
-          </Text>
+          <Text style={styles.passwordChangedText}>Master Key Changed</Text>
           <TouchableOpacity
             style={styles.passwordChangedButton}
             onPress={() => router.navigate("/passwords")}
