@@ -9,10 +9,12 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { openDatabase } from "expo-sqlite";
 const db = openDatabase("masterKey.db");
 
 export default function Page() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [mainPassword, setMainPassword] = useState(""); //to set UP !!!!!!!!!!!!!!!!!!!!!!!!!
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
@@ -30,7 +32,19 @@ export default function Page() {
       )
     );
     fetchPass();
+    getIsDarkModeFromPersistentStorage();
   }, []);
+
+  const getIsDarkModeFromPersistentStorage = async () => {
+    try {
+      const result = await AsyncStorage.getItem("isDarkMode");
+      if (result == null) {
+        await AsyncStorage.setItem("isDarkMode", isDarkMode);
+      } else {
+        setIsDarkMode(result);
+      }
+    } catch (e) {}
+  };
 
   const fetchPass = () => {
     db.transaction((tx) =>

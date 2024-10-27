@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,8 +9,13 @@ import {
   View,
 } from "react-native";
 import BackButton from "../components/BackButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function Page() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  useEffect(() => {
+    getDarkModeSettings();
+  }, []);
   return (
     <View style={styles.container}>
       <BackButton />
@@ -20,8 +25,27 @@ function Page() {
       >
         <Text>Change Master Password</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.option}
+        onPress={() => {
+          setIsDarkMode(changeDarkModeSetting());
+        }}
+      >
+        <Text>Dark Mode: {isDarkMode ? "ON" : "OFF"}</Text>
+      </TouchableOpacity>
     </View>
   );
+}
+
+async function getDarkModeSettings() {
+  const result = await AsyncStorage.getItem("isDarkMode");
+  if (result !== null) {
+    return result;
+  }
+  return false;
+}
+async function changeDarkModeSetting() {
+  await AsyncStorage.setItem("isDarkMode", !result);
 }
 
 export default Page;
@@ -35,6 +59,8 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "flex-start",
+    flexDirection: "column",
+    gap: 20,
   },
   option: {
     width: "100%",
