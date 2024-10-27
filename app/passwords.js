@@ -12,6 +12,7 @@ import AddCredential from "../components/AddCredential";
 import * as SQLite from "expo-sqlite";
 import Card from "../components/Card";
 import { router } from "expo-router";
+import { getDarkModeSettings } from "./setting";
 
 const db = SQLite.openDatabase("Credentials.db");
 
@@ -20,7 +21,9 @@ export default function Page() {
   const [isAddingCredential, setIsAddingCredential] = useState(false);
   const [hasKeyword, setHasKeyword] = useState(false);
   const [searchList, setSearchList] = useState([]);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
+    getDarkModeSettings(setIsDarkMode);
     db.transaction((tx) => {
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS Credentials (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL)",
@@ -89,17 +92,23 @@ export default function Page() {
       <Card card={card} removeCreds={() => removeCreds(card)} key={card.id} />
     ));
   }, [searchList]);
+
   return (
-    <View style={styles.container}>
+    <View style={!isDarkMode ? styles.container : styles.darkContainer}>
       <TextInput
-        style={styles.searchbar}
+        style={!isDarkMode ? styles.searchbar : styles.darkSearchbar}
         placeholder="search"
+        placeholderTextColor={!isDarkMode ? "black" : "white"}
         onChangeText={(e) => {
           searchHandler(e, passwords);
         }}
       />
-      <Text style={styles.header}>Credentials</Text>
-      <ScrollView style={styles.scrollView}>
+      <Text style={!isDarkMode ? styles.header : styles.darkHeader}>
+        Credentials
+      </Text>
+      <ScrollView
+        style={!isDarkMode ? styles.scrollView : styles.darkScrollView}
+      >
         {!hasKeyword ? passwordCards : searchListCards}
       </ScrollView>
       {isAddingCredential && (
@@ -109,21 +118,35 @@ export default function Page() {
           setIsAddingCredential={setIsAddingCredential}
           fetchCredentials={fetchCredentials}
           handleAddCredentials={handleAddCredentials}
+          isDarkMode={isDarkMode}
         />
       )}
       {!isAddingCredential && (
-        <View style={styles.optionBar} id="bottomOptions">
+        <View
+          style={!isDarkMode ? styles.optionBar : styles.darkOptionBar}
+          id="bottomOptions"
+        >
           <TouchableHighlight
-            style={styles.addPasswordButton}
+            style={
+              !isDarkMode
+                ? styles.addPasswordButton
+                : styles.darkAddPasswordButton
+            }
             onPress={addModal}
           >
-            <Text style={{ fontWeight: "800" }}>Add Credentials</Text>
+            <Text style={!isDarkMode ? styles.font : styles.darkFont}>
+              Add Credentials
+            </Text>
           </TouchableHighlight>
           <TouchableHighlight
-            style={styles.settingButton}
+            style={
+              !isDarkMode ? styles.settingButton : styles.darkSettingButton
+            }
             onPress={() => router.replace("/setting")}
           >
-            <Text style={{ fontWeight: "800" }}>Settings</Text>
+            <Text style={!isDarkMode ? styles.font : styles.darkFont}>
+              Settings
+            </Text>
           </TouchableHighlight>
         </View>
       )}
@@ -132,6 +155,8 @@ export default function Page() {
 }
 
 const styles = StyleSheet.create({
+  font: { fontWeight: "800", color: "black" },
+  darkFont: { fontWeight: "800", color: "white" },
   optionBar: {
     display: "flex",
     flexDirection: "row",
@@ -142,9 +167,26 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+  darkOptionBar: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "black",
+    color: "white",
+  },
   header: {
     fontSize: 32,
     fontWeight: "800",
+  },
+  darkHeader: {
+    fontSize: 32,
+    fontWeight: "800",
+    color: "white",
   },
   searchbar: {
     borderWidth: 1,
@@ -158,17 +200,52 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 5,
   },
+  darkSearchbar: {
+    borderWidth: 1,
+    borderRadius: 12,
+    width: "100%",
+    minHeight: 32,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    marginTop: 10,
+    marginBottom: 5,
+    backgroundColor: "black",
+    color: "white",
+    borderColor: "white",
+  },
   scrollView: {
     width: "100%",
     paddingLeft: 10,
     paddingRight: 10,
+  },
+  darkScrollView: {
+    width: "100%",
+    paddingLeft: 10,
+    paddingRight: 10,
+    backgroundColor: "black",
+    color: "white",
   },
   container: {
     flex: 1,
     alignItems: "center",
     padding: 24,
   },
+  darkContainer: {
+    flex: 1,
+    alignItems: "center",
+    padding: 24,
+    backgroundColor: "black",
+    color: "white",
+  },
   main: {
+    flex: 1,
+    justifyContent: "center",
+    marginHorizontal: "auto",
+    width: "auto",
+  },
+  darkMain: {
     flex: 1,
     justifyContent: "center",
     marginHorizontal: "auto",
@@ -184,6 +261,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderTopLeftRadius: 10,
   },
+  darkAddPasswordButton: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    maxWidth: 960,
+    height: 45,
+    width: "50%",
+    borderWidth: 1,
+    borderTopLeftRadius: 10,
+    backgroundColor: "black",
+    color: "white",
+    borderColor: "white",
+  },
   settingButton: {
     display: "flex",
     justifyContent: "center",
@@ -193,5 +283,18 @@ const styles = StyleSheet.create({
     width: "50%",
     borderWidth: 1,
     borderTopRightRadius: 10,
+  },
+  darkSettingButton: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    maxWidth: 960,
+    height: 45,
+    width: "50%",
+    borderWidth: 1,
+    borderTopRightRadius: 10,
+    backgroundColor: "black",
+    color: "white",
+    borderColor: "white",
   },
 });
