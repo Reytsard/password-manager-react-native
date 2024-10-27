@@ -4,9 +4,12 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
+import BackButton from "../../components/BackButton";
+import { router } from "expo-router";
 
 const db = openDatabase("masterKey.db");
 
@@ -16,6 +19,8 @@ export default function Page() {
   const [newPassword, setNewPassword] = useState("");
   const [retypeNewPassword, setRetypeNewPassword] = useState("");
   const [hasError, setHasError] = useState(false);
+  const [isDoneChanging, setIsDoneChanging] = useState(false);
+  const [disabledInputs, setDisabledInputs] = useState(false);
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -48,10 +53,17 @@ export default function Page() {
       );
     });
   };
+  const showToast = () => {
+    ToastAndroid.show("Master Key successfully changed.", ToastAndroid.SHORT);
+  };
+
   const changePasswordHandler = () => {
     if (verifyCreds(retypeNewPassword, newPassword)) {
       if (verifyCreds(password, oldPassword)) {
+        setDisabledInputs(true);
         updateMasterKey(newPassword);
+        setIsDoneChanging(true);
+        showToast();
       } else {
         setHasError(true);
       }
@@ -64,6 +76,7 @@ export default function Page() {
   };
   return (
     <View style={styles.container}>
+      <BackButton />
       <Text style={styles.header}>Change Master Key</Text>
       <View style={styles.label}>
         <Text style={styles.text}>Input Current Master Key</Text>
@@ -72,6 +85,7 @@ export default function Page() {
           style={styles.inputs}
           value={oldPassword}
           onChangeText={(e) => setOldPassword(e)}
+          editable={!disabledInputs}
         />
       </View>
       <View style={styles.label}>
@@ -81,6 +95,7 @@ export default function Page() {
           style={styles.inputs}
           value={newPassword}
           onChangeText={(e) => setNewPassword(e)}
+          editable={!disabledInputs}
         />
       </View>
       <View style={styles.label}>
@@ -90,6 +105,7 @@ export default function Page() {
           style={styles.inputs}
           value={retypeNewPassword}
           onChangeText={(e) => setRetypeNewPassword(e)}
+          editable={!disabledInputs}
         />
       </View>
       {hasError ? (
@@ -99,9 +115,21 @@ export default function Page() {
       ) : (
         <></>
       )}
-      <TouchableOpacity style={styles.button} onPress={changePasswordHandler}>
-        <Text style={styles.buttonText}>Change Master Key</Text>
-      </TouchableOpacity>
+      {!isDoneChanging ? (
+        <TouchableOpacity style={styles.button} onPress={changePasswordHandler}>
+          <Text style={styles.buttonText}>Change Master Key</Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.passwordChanged}>
+          <Text style={styles.passwordChangedText}>Master Key Changed</Text>
+          <TouchableOpacity
+            style={styles.passwordChangedButton}
+            onPress={() => router.navigate("/passwords")}
+          >
+            <Text>Return to Main menu</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -132,7 +160,7 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     display: "flex",
-    alignitems: "center",
+    alignItems: "center",
     justifyContent: "flex-start",
   },
   inputs: {
@@ -150,12 +178,26 @@ const styles = StyleSheet.create({
     width: 200,
     borderWidth: 1,
     display: "flex",
-    alignitems: "center",
+    alignItems: "center",
     justifyContent: "center",
     borderRadius: 40,
   },
   buttonText: {
     fontSize: 16,
     textAlign: "center",
+  },
+  passwordChanged: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+  },
+  passwordChangedText: {
+    fontSize: 20,
+  },
+  passwordChangedButton: {
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 2,
   },
 });

@@ -54,6 +54,8 @@ export default function Page() {
         (_, result) => {
           if (result.rows.length > 0) {
             sethasMasterKey(true);
+            const pass = result.rows._array[0];
+            setMainPassword(pass.password);
           }
         },
         (_, error) => console.error("Error fetching credentials", error)
@@ -63,7 +65,6 @@ export default function Page() {
 
   const verifyPassword = () => {
     if (passwordInput == mainPassword) {
-      console.log("passwordInput ", passwordInput);
       setIsLoggedIn(true);
       router.replace("/passwords");
     }

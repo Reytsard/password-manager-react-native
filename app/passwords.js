@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  FlatList,
   ScrollView,
   StyleSheet,
   Text,
@@ -99,13 +98,10 @@ export default function Page() {
           searchHandler(e, passwords);
         }}
       />
-
       <Text style={styles.header}>Credentials</Text>
-
       <ScrollView style={styles.scrollView}>
         {!hasKeyword ? passwordCards : searchListCards}
       </ScrollView>
-
       {isAddingCredential && (
         <AddCredential
           passwords={passwords}
@@ -115,17 +111,22 @@ export default function Page() {
           handleAddCredentials={handleAddCredentials}
         />
       )}
-      <View style={styles.optionBar}>
-        <TouchableHighlight style={styles.addPasswordButton} onPress={addModal}>
-          <Text>Add Credentials</Text>
-        </TouchableHighlight>
-        <TouchableHighlight
-          style={styles.addPasswordButton}
-          onPress={() => router.replace("/setting")}
-        >
-          <Text>Settings</Text>
-        </TouchableHighlight>
-      </View>
+      {!isAddingCredential && (
+        <View style={styles.optionBar} id="bottomOptions">
+          <TouchableHighlight
+            style={styles.addPasswordButton}
+            onPress={addModal}
+          >
+            <Text style={{ fontWeight: "800" }}>Add Credentials</Text>
+          </TouchableHighlight>
+          <TouchableHighlight
+            style={styles.settingButton}
+            onPress={() => router.replace("/setting")}
+          >
+            <Text style={{ fontWeight: "800" }}>Settings</Text>
+          </TouchableHighlight>
+        </View>
+      )}
     </View>
   );
 }
@@ -157,10 +158,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 5,
   },
-
-  creds: {
-    // design remove button and edit to be in one column
-  },
   scrollView: {
     width: "100%",
     paddingLeft: 10,
@@ -182,9 +179,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     maxWidth: 960,
-    height: 40,
+    height: 45,
     width: "50%",
-    backgroundColor: "gray",
-    borderRadius: 10,
+    borderWidth: 1,
+    borderTopLeftRadius: 10,
+  },
+  settingButton: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    maxWidth: 960,
+    height: 45,
+    width: "50%",
+    borderWidth: 1,
+    borderTopRightRadius: 10,
   },
 });
