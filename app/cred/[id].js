@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import BackButton from "../../components/BackButton";
+import { getDarkModeSettings } from "../setting";
 
 const db = openDatabase("Credentials.db");
 
@@ -18,6 +19,7 @@ function Page() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const { id } = useLocalSearchParams();
   //todo: create a verification that they will change it
@@ -35,6 +37,7 @@ function Page() {
         }
       )
     );
+    getDarkModeSettings(setIsDarkMode);
   }, []);
   const updateCreds = () => {
     db.transaction((tx) =>
@@ -56,32 +59,54 @@ function Page() {
       )
     );
   };
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View>
-        <BackButton />
-        <View style={styles.container}>
+        <BackButton isDarkMode={isDarkMode} />
+        <View style={isDarkMode ? styles.darkContainer : styles.container}>
           <TextInput
             value={name}
             onChangeText={(e) => setName(e)}
-            style={styles.name}
+            style={isDarkMode ? styles.darkName : styles.name}
           />
-          <View style={styles.infos}>
+          <View style={isDarkMode ? styles.darkInfos : styles.infos}>
             <Text>Email/Username:</Text>
             <TextInput
               value={username}
               onChangeText={(e) => setUsername(e)}
-              style={styles.info}
+              style={isDarkMode ? styles.darkInfo : styles.info}
             />
             <Text>Password:</Text>
             <TextInput
               value={password}
               onChangeText={(e) => setPassword(e)}
-              style={styles.info}
+              style={isDarkMode ? styles.darkInfo : styles.info}
             />
             <View style={styles.options}>
               <TouchableHighlight style={styles.saveButton}>
-                <Text onPress={updateCreds} style={{ fontSize: 18 }}>
+                <Text
+                  onPress={updateCreds}
+                  style={
+                    isDarkMode
+                      ? {
+                          fontSize: 18,
+                          color: "white",
+                          borderColor: "white",
+                          borderWidth: 1,
+                          padding: 20,
+                          borderRadius: 20,
+                        }
+                      : {
+                          fontSize: 18,
+                          color: "black",
+                          borderColor: "black",
+                          borderWidth: 1,
+                          padding: 20,
+                          borderRadius: 20,
+                        }
+                  }
+                >
                   Save
                 </Text>
               </TouchableHighlight>
@@ -115,6 +140,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "black",
     color: "white",
+    borderColor: "white",
   },
   infos: {
     width: "100%",
@@ -145,6 +171,9 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     backgroundColor: "black",
     color: "white",
+    padding: 5,
+    borderWidth: 1,
+    borderColor: "white",
   },
   options: {
     display: "flex",
@@ -181,6 +210,9 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     backgroundColor: "black",
     color: "white",
+    padding: 5,
+    borderWidth: 1,
+    borderColor: "white",
   },
   backButton: {
     position: "absolute",

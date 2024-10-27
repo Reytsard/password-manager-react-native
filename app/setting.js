@@ -27,7 +27,7 @@ function Page() {
           Change Master Password
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={!isDarkMode ? styles.option : styles.darkOption}
         onPress={() => {
           changeDarkModeSetting(isDarkMode, setIsDarkMode);
@@ -36,7 +36,7 @@ function Page() {
         <Text style={!isDarkMode ? styles.font : styles.darkFont}>
           Dark Mode: {isDarkMode ? "ON" : "OFF"}
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }
@@ -49,12 +49,6 @@ export async function getDarkModeSettings(func) {
       return result === "true";
     }
     return false;
-  } catch (e) {}
-}
-async function changeDarkModeSetting(value, func) {
-  try {
-    await AsyncStorage.setItem("isDarkMode", !value + "");
-    func(!value);
   } catch (e) {}
 }
 
