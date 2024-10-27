@@ -1,11 +1,13 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableWithoutFeedback } from "react-native";
 
-function BackButton() {
+function BackButton({ isDarkMode }) {
   return (
     <TouchableWithoutFeedback onPress={() => router.navigate("/passwords")}>
-      <Text style={styles.backButton}>{"<"}</Text>
+      <Text style={!isDarkMode ? styles.backButton : styles.DarkBackButton}>
+        {"<"}
+      </Text>
     </TouchableWithoutFeedback>
   );
 }
@@ -19,5 +21,13 @@ const styles = StyleSheet.create({
     left: 0,
     paddingLeft: 15,
     fontSize: 42,
+  },
+  DarkBackButton: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    paddingLeft: 15,
+    fontSize: 42,
+    color: "white",
   },
 });

@@ -14,41 +14,47 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 function Page() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
-    getDarkModeSettings();
+    getDarkModeSettings(setIsDarkMode);
   }, []);
   return (
-    <View style={styles.container}>
-      <BackButton />
+    <View style={!isDarkMode ? styles.container : styles.darkContainer}>
+      <BackButton isDarkMode={isDarkMode} />
       <TouchableOpacity
-        style={styles.option}
+        style={!isDarkMode ? styles.option : styles.darkOption}
         onPress={() => router.navigate("/settings/changeMasterKey")}
       >
-        <Text>Change Master Password</Text>
+        <Text style={!isDarkMode ? styles.font : styles.darkFont}>
+          Change Master Password
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles.option}
+        style={!isDarkMode ? styles.option : styles.darkOption}
         onPress={() => {
-          setIsDarkMode(changeDarkModeSetting());
+          changeDarkModeSetting(isDarkMode, setIsDarkMode);
         }}
       >
-        <Text>Dark Mode: {isDarkMode ? "ON" : "OFF"}</Text>
+        <Text style={!isDarkMode ? styles.font : styles.darkFont}>
+          Dark Mode: {isDarkMode ? "ON" : "OFF"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-async function getDarkModeSettings() {
+export async function getDarkModeSettings(func) {
   try {
     const result = await AsyncStorage.getItem("isDarkMode");
     if (result !== null) {
-      return result;
+      func(result === "true");
+      return result === "true";
     }
     return false;
   } catch (e) {}
 }
-async function changeDarkModeSetting() {
+async function changeDarkModeSetting(value, func) {
   try {
-    await AsyncStorage.setItem("isDarkMode", !result);
+    await AsyncStorage.setItem("isDarkMode", !value + "");
+    func(!value);
   } catch (e) {}
 }
 
@@ -66,6 +72,19 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 20,
   },
+  darkContainer: {
+    height: "100%",
+    paddingTop: 100,
+    paddingLeft: 10,
+    paddingRight: 10,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
+    gap: 20,
+    backgroundColor: "black",
+    color: "white",
+  },
   option: {
     width: "100%",
     maxHeight: 60,
@@ -74,5 +93,23 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+  },
+  darkOption: {
+    width: "100%",
+    maxHeight: 60,
+    flex: 1,
+    borderWidth: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "black",
+    color: "white",
+    borderColor: "white",
+  },
+  font: {
+    color: "black",
+  },
+  darkFont: {
+    color: "white",
   },
 });

@@ -39,9 +39,9 @@ export default function Page() {
     try {
       const result = await AsyncStorage.getItem("isDarkMode");
       if (result == null) {
-        await AsyncStorage.setItem("isDarkMode", isDarkMode);
+        await AsyncStorage.setItem("isDarkMode", isDarkMode + "");
       } else {
-        setIsDarkMode(result);
+        setIsDarkMode(result === "true");
       }
     } catch (e) {}
   };
@@ -85,21 +85,21 @@ export default function Page() {
   };
 
   return (
-    <View style={isDarkMode ? styles.container : styles.darkContainer}>
+    <View style={!isDarkMode ? styles.container : styles.darkContainer}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={isDarkMode ? styles.main : styles.darkMain}>
-          <Text style={isDarkMode ? styles.title : styles.darkTitle}>
+        <View style={!isDarkMode ? styles.main : styles.darkMain}>
+          <Text style={!isDarkMode ? styles.title : styles.darkTitle}>
             Password Manager
           </Text>
           {hasMasterKey ? (
             <View>
-              <Text style={isDarkMode ? styles.subtitle : styles.darkSubTitle}>
+              <Text style={!isDarkMode ? styles.subtitle : styles.darkSubTitle}>
                 Password:
               </Text>
               <TextInput
                 secureTextEntry={true}
                 style={
-                  isDarkMode ? styles.passwordInput : styles.darkPasswordInput
+                  !isDarkMode ? styles.passwordInput : styles.darkPasswordInput
                 }
                 onChangeText={(e) => setPasswordInput(e)}
                 value={passwordInput}
@@ -113,13 +113,13 @@ export default function Page() {
             </View>
           ) : (
             <View>
-              <Text style={isDarkMode ? styles.subtitle : styles.darkSubTitle}>
+              <Text style={!isDarkMode ? styles.subtitle : styles.darkSubTitle}>
                 Create Master Key:
               </Text>
               <TextInput
                 secureTextEntry={true}
                 style={
-                  isDarkMode ? styles.passwordInput : styles.darkPasswordInput
+                  !isDarkMode ? styles.passwordInput : styles.darkPasswordInput
                 }
                 onChangeText={(e) => setToSetKey(e)}
                 value={toSetKey}
@@ -197,8 +197,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 24,
     height: 36,
-    color: "black",
-    backgroundColor: "white",
+    borderColor: "white",
+    borderWidth: 1,
+    color: "#FFFFFF",
+    backgroundColor: "black",
   },
   loginButton: {
     height: "36px",
