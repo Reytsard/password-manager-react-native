@@ -11,7 +11,9 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { openDatabase } from "expo-sqlite";
+import * as SystemUI from "expo-system-ui";
 const db = openDatabase("masterKey.db");
+SystemUI.setBackgroundColorAsync("black");
 
 export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(false);
