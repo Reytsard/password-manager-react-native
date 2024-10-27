@@ -9,10 +9,12 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { openDatabase } from "expo-sqlite";
 const db = openDatabase("masterKey.db");
 
 export default function Page() {
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [mainPassword, setMainPassword] = useState(""); //to set UP !!!!!!!!!!!!!!!!!!!!!!!!!
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
@@ -30,7 +32,19 @@ export default function Page() {
       )
     );
     fetchPass();
+    getIsDarkModeFromPersistentStorage();
   }, []);
+
+  const getIsDarkModeFromPersistentStorage = async () => {
+    try {
+      const result = await AsyncStorage.getItem("isDarkMode");
+      if (result == null) {
+        await AsyncStorage.setItem("isDarkMode", isDarkMode + "");
+      } else {
+        setIsDarkMode(result === "true");
+      }
+    } catch (e) {}
+  };
 
   const fetchPass = () => {
     db.transaction((tx) =>
@@ -40,6 +54,8 @@ export default function Page() {
         (_, result) => {
           if (result.rows.length > 0) {
             sethasMasterKey(true);
+            const pass = result.rows._array[0];
+            setMainPassword(pass.password);
           }
         },
         (_, error) => console.error("Error fetching credentials", error)
@@ -49,7 +65,6 @@ export default function Page() {
 
   const verifyPassword = () => {
     if (passwordInput == mainPassword) {
-      console.log("passwordInput ", passwordInput);
       setIsLoggedIn(true);
       router.replace("/passwords");
     }
@@ -70,16 +85,22 @@ export default function Page() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={!isDarkMode ? styles.container : styles.darkContainer}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={styles.main}>
-          <Text style={styles.title}>Password Manager</Text>
+        <View style={!isDarkMode ? styles.main : styles.darkMain}>
+          <Text style={!isDarkMode ? styles.title : styles.darkTitle}>
+            Password Manager
+          </Text>
           {hasMasterKey ? (
             <View>
-              <Text style={styles.subtitle}>Password:</Text>
+              <Text style={!isDarkMode ? styles.subtitle : styles.darkSubTitle}>
+                Password:
+              </Text>
               <TextInput
                 secureTextEntry={true}
-                style={styles.passwordInput}
+                style={
+                  !isDarkMode ? styles.passwordInput : styles.darkPasswordInput
+                }
                 onChangeText={(e) => setPasswordInput(e)}
                 value={passwordInput}
               />
@@ -92,10 +113,14 @@ export default function Page() {
             </View>
           ) : (
             <View>
-              <Text style={styles.subtitle}>Create Master Key:</Text>
+              <Text style={!isDarkMode ? styles.subtitle : styles.darkSubTitle}>
+                Create Master Key:
+              </Text>
               <TextInput
                 secureTextEntry={true}
-                style={styles.passwordInput}
+                style={
+                  !isDarkMode ? styles.passwordInput : styles.darkPasswordInput
+                }
                 onChangeText={(e) => setToSetKey(e)}
                 value={toSetKey}
               />
@@ -119,21 +144,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 24,
   },
+  darkContainer: {
+    flex: 1,
+    alignItems: "center",
+    padding: 24,
+    backgroundColor: "black",
+    color: "white",
+  },
   main: {
     flex: 1,
     justifyContent: "center",
     maxWidth: 960,
     marginHorizontal: "auto",
   },
+  darkMain: {
+    flex: 1,
+    justifyContent: "center",
+    maxWidth: 960,
+    marginHorizontal: "auto",
+    backgroundColor: "black",
+  },
   title: {
     textAlign: "center",
     fontSize: 64,
     fontWeight: "bold",
   },
+  darkTitle: {
+    textAlign: "center",
+    fontSize: 64,
+    fontWeight: "bold",
+    color: "white",
+  },
   subtitle: {
     fontSize: 36,
     color: "#38434D",
     textAlign: "center",
+  },
+  darkSubTitle: {
+    fontSize: 36,
+    color: "#38434D",
+    textAlign: "center",
+    color: "white",
   },
   passwordInput: {
     textAlign: "center",
@@ -141,6 +192,15 @@ const styles = StyleSheet.create({
     height: 36,
     color: "#FFFFFF",
     backgroundColor: "#7F7F7F",
+  },
+  darkPasswordInput: {
+    textAlign: "center",
+    fontSize: 24,
+    height: 36,
+    borderColor: "white",
+    borderWidth: 1,
+    color: "#FFFFFF",
+    backgroundColor: "black",
   },
   loginButton: {
     height: "36px",

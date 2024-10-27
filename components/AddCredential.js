@@ -25,33 +25,52 @@ export default function AddCredential(props) {
     props.setIsAddingCredential(false);
   };
   return (
-    <View style={styles.modal}>
-      <Text style={styles.header}>Add Credentials</Text>
+    <View style={!props.isDarkMode ? styles.modal : styles.darkModal}>
+      <Text style={!props.isDarkMode ? styles.header : styles.darkHeader}>
+        Add Credentials
+      </Text>
       <TextInput
         placeholder="Name"
+        placeholderTextColor={!props.isDarkMode ? "black" : "white"}
         onChangeText={(e) => setName(e)}
         value={name}
-        style={styles.input}
+        style={!props.isDarkMode ? styles.input : styles.darkInput}
       />
       <TextInput
         placeholder="Username"
+        placeholderTextColor={!props.isDarkMode ? "black" : "white"}
         onChangeText={(e) => setEmail(e)}
         value={email}
-        style={styles.input}
+        style={!props.isDarkMode ? styles.input : styles.darkInput}
       />
       <TextInput
         secureTextEntry
         placeholder="Password"
+        placeholderTextColor={!props.isDarkMode ? "black" : "white"}
         onChangeText={(e) => setPassword(e)}
         value={password}
-        style={styles.input}
+        style={!props.isDarkMode ? styles.input : styles.darkInput}
       />
       <View style={styles.options}>
-        <TouchableOpacity onPress={addCredential} style={styles.button}>
-          <Text>Add</Text>
+        <TouchableOpacity
+          onPress={addCredential}
+          style={!props.isDarkMode ? styles.button : styles.darkButton}
+        >
+          <Text
+            style={!props.isDarkMode ? { color: "black" } : { color: "white" }}
+          >
+            Add
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={cancelHandler} style={styles.button}>
-          <Text>Cancel</Text>
+        <TouchableOpacity
+          onPress={cancelHandler}
+          style={!props.isDarkMode ? styles.button : styles.darkButton}
+        >
+          <Text
+            style={!props.isDarkMode ? { color: "black" } : { color: "white" }}
+          >
+            Cancel
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -65,9 +84,22 @@ const styles = StyleSheet.create({
     height: 300,
     width: "100%",
   },
+  darkModal: {
+    maxHeight: 320,
+    maxWidth: 920,
+    height: 300,
+    width: "100%",
+    backgroundColor: "black",
+    color: "white",
+  },
   header: {
     textAlign: "center",
     fontSize: 26,
+  },
+  darkHeader: {
+    textAlign: "center",
+    fontSize: 26,
+    color: "white",
   },
   input: {
     borderWidth: 1,
@@ -76,6 +108,17 @@ const styles = StyleSheet.create({
     height: 50,
     paddingLeft: 10,
     paddingRight: 10,
+  },
+  darkInput: {
+    borderWidth: 1,
+    borderRadius: 5,
+    marginTop: 5,
+    height: 50,
+    paddingLeft: 10,
+    paddingRight: 10,
+    backgroundColor: "black",
+    color: "white",
+    borderColor: "white",
   },
   options: {
     marginTop: 10,
@@ -94,5 +137,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 40,
+  },
+  darkButton: {
+    height: 50,
+    width: 80,
+    borderWidth: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 40,
+    backgroundColor: "black",
+    color: "white",
+    borderColor: "white",
   },
 });

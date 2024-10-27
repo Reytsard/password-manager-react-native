@@ -1,12 +1,17 @@
 import { openDatabase } from "expo-sqlite";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
 import * as SQLite from "expo-sqlite";
 import { router } from "expo-router";
+import { getDarkModeSettings } from "../app/setting";
 
 const db = SQLite.openDatabase("Credentials.db");
 
 function Card({ card, removeCreds }) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  useEffect(() => {
+    getDarkModeSettings(setIsDarkMode);
+  });
   const deleteTuple = (tupleId) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -33,24 +38,34 @@ function Card({ card, removeCreds }) {
     router.replace("/cred/" + id);
   };
   return (
-    <View key={card.id} style={styles.card}>
-      <View style={styles.creds}>
-        <Text style={styles.textTitle}>{card.name}</Text>
-        <Text>Username: {card.email}</Text>
-        <Text>Password: {card.password}</Text>
+    <View key={card.id} style={!isDarkMode ? styles.card : styles.darkCard}>
+      <View style={!isDarkMode ? styles.creds : styles.darkCreds}>
+        <Text style={!isDarkMode ? styles.textTitle : styles.darkTextTitle}>
+          {card.name}
+        </Text>
+        <Text style={!isDarkMode ? { color: "black" } : { color: "white" }}>
+          Username: {card.email}
+        </Text>
+        <Text style={!isDarkMode ? { color: "black" } : { color: "white" }}>
+          Password: {card.password}
+        </Text>
       </View>
       <View style={styles.cardOptions}>
         <TouchableHighlight
-          style={styles.cardOption}
+          style={!isDarkMode ? styles.cardOption : styles.darkcardOption}
           onPress={() => editHandler(card.id)}
         >
-          <Text>Edit</Text>
+          <Text style={!isDarkMode ? { color: "black" } : { color: "white" }}>
+            Edit
+          </Text>
         </TouchableHighlight>
         <TouchableHighlight
-          style={styles.cardOption}
+          style={!isDarkMode ? styles.cardOption : styles.darkcardOption}
           onPress={removeCardHandler}
         >
-          <Text>Remove</Text>
+          <Text style={!isDarkMode ? { color: "black" } : { color: "white" }}>
+            Remove
+          </Text>
         </TouchableHighlight>
       </View>
     </View>
@@ -61,6 +76,7 @@ export default Card;
 
 const styles = StyleSheet.create({
   textTitle: { fontSize: 24, fontWeight: "800" },
+  darkTextTitle: { fontSize: 24, fontWeight: "800", color: "white" },
   card: {
     borderWidth: 2,
     borderRadius: 10,
@@ -72,7 +88,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  darkCard: {
+    borderWidth: 2,
+    borderRadius: 10,
+    padding: 5,
+    marginTop: 10,
+    display: "flex",
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "black",
+    borderColor: "white",
+  },
   creds: { display: "flex", flexDirection: "column", gap: 5 },
+  darkCreds: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 5,
+    color: "white",
+  },
   cardOptions: {
     display: "flex",
     flexDirection: "column",
@@ -88,16 +123,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
   },
+  darkcardOption: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: 40,
+    width: 65,
+    backgroundColor: "black",
+    color: "white",
+    borderColor: "white",
+    borderWidth: 1,
+    borderRadius: 10,
+  },
 });
-/*
-card: {
-    display: "flex",
-    maxWidth: 920,
-    flexDirection: "row",
-  },
-  cardOptions: {
-    display: "flex",
-    flexDirection: "row",
-  },
-  cardOption: {},
-  */
