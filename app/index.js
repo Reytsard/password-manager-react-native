@@ -85,16 +85,22 @@ export default function Page() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={isDarkMode ? styles.container : styles.darkContainer}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={styles.main}>
-          <Text style={styles.title}>Password Manager</Text>
+        <View style={isDarkMode ? styles.main : styles.darkMain}>
+          <Text style={isDarkMode ? styles.title : styles.darkTitle}>
+            Password Manager
+          </Text>
           {hasMasterKey ? (
             <View>
-              <Text style={styles.subtitle}>Password:</Text>
+              <Text style={isDarkMode ? styles.subtitle : styles.darkSubTitle}>
+                Password:
+              </Text>
               <TextInput
                 secureTextEntry={true}
-                style={styles.passwordInput}
+                style={
+                  isDarkMode ? styles.passwordInput : styles.darkPasswordInput
+                }
                 onChangeText={(e) => setPasswordInput(e)}
                 value={passwordInput}
               />
@@ -107,10 +113,14 @@ export default function Page() {
             </View>
           ) : (
             <View>
-              <Text style={styles.subtitle}>Create Master Key:</Text>
+              <Text style={isDarkMode ? styles.subtitle : styles.darkSubTitle}>
+                Create Master Key:
+              </Text>
               <TextInput
                 secureTextEntry={true}
-                style={styles.passwordInput}
+                style={
+                  isDarkMode ? styles.passwordInput : styles.darkPasswordInput
+                }
                 onChangeText={(e) => setToSetKey(e)}
                 value={toSetKey}
               />
@@ -134,21 +144,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 24,
   },
+  darkContainer: {
+    flex: 1,
+    alignItems: "center",
+    padding: 24,
+    backgroundColor: "black",
+    color: "white",
+  },
   main: {
     flex: 1,
     justifyContent: "center",
     maxWidth: 960,
     marginHorizontal: "auto",
   },
+  darkMain: {
+    flex: 1,
+    justifyContent: "center",
+    maxWidth: 960,
+    marginHorizontal: "auto",
+    backgroundColor: "black",
+  },
   title: {
     textAlign: "center",
     fontSize: 64,
     fontWeight: "bold",
   },
+  darkTitle: {
+    textAlign: "center",
+    fontSize: 64,
+    fontWeight: "bold",
+    color: "white",
+  },
   subtitle: {
     fontSize: 36,
     color: "#38434D",
     textAlign: "center",
+  },
+  darkSubTitle: {
+    fontSize: 36,
+    color: "#38434D",
+    textAlign: "center",
+    color: "white",
   },
   passwordInput: {
     textAlign: "center",
@@ -156,6 +192,13 @@ const styles = StyleSheet.create({
     height: 36,
     color: "#FFFFFF",
     backgroundColor: "#7F7F7F",
+  },
+  darkPasswordInput: {
+    textAlign: "center",
+    fontSize: 24,
+    height: 36,
+    color: "black",
+    backgroundColor: "white",
   },
   loginButton: {
     height: "36px",

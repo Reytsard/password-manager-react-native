@@ -38,14 +38,18 @@ function Page() {
 }
 
 async function getDarkModeSettings() {
-  const result = await AsyncStorage.getItem("isDarkMode");
-  if (result !== null) {
-    return result;
-  }
-  return false;
+  try {
+    const result = await AsyncStorage.getItem("isDarkMode");
+    if (result !== null) {
+      return result;
+    }
+    return false;
+  } catch (e) {}
 }
 async function changeDarkModeSetting() {
-  await AsyncStorage.setItem("isDarkMode", !result);
+  try {
+    await AsyncStorage.setItem("isDarkMode", !result);
+  } catch (e) {}
 }
 
 export default Page;
