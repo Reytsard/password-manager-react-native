@@ -5,7 +5,7 @@
     "scheme": "password-manager",
     "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/abby-1.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/abby-1.png",
