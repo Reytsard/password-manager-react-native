@@ -77,7 +77,12 @@ export default function Page() {
   };
   const passwordCards = useMemo(() => {
     return passwords.map((card) => (
-      <Card card={card} removeCreds={() => removeCreds(card)} key={card.id} />
+      <Card
+        card={card}
+        removeCreds={() => removeCreds(card)}
+        key={card.id}
+        isDarkMode={isDarkMode}
+      />
     ));
   }, [passwords]);
 

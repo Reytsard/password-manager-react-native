@@ -46,8 +46,6 @@ function Page() {
 
 export async function checkAndChangeSystemUIColor(setIsDarkMode) {
   const color = await SystemUI.getBackgroundColorAsync();
-  console.log(color);
-  console.log("#000000" == color);
   if (color == "#000000") {
     await SystemUI.setBackgroundColorAsync("white");
     await AsyncStorage.setItem("isDarkMode", "false");
