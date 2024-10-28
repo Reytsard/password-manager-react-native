@@ -11,14 +11,7 @@ export default function AddCredential(props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  useEffect(() => {
-    async function getAndSetIsDarkMode() {
-      const color = await SystemUI.getBackgroundColorAsync();
-      console.log("password: ", color);
-      color == "#000000" ? setIsDarkMode(true) : setIsDarkMode(false);
-    }
-    getAndSetIsDarkMode();
-  }, []);
+  useEffect(() => {}, []);
   const addCredential = () => {
     props.handleAddCredentials(name, email, password);
     setName("");

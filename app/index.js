@@ -43,7 +43,12 @@ export default function Page() {
       if (result == null) {
         await AsyncStorage.setItem("isDarkMode", isDarkMode + "");
       } else {
-        setIsDarkMode(result == "true");
+        if (result == "true") {
+          setIsDarkMode(result == "true");
+          SystemUI.setBackgroundColorAsync("black");
+        } else {
+          SystemUI.setBackgroundColorAsync("white");
+        }
       }
     } catch (e) {}
   };

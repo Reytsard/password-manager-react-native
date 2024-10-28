@@ -10,8 +10,14 @@ const db = SQLite.openDatabase("Credentials.db");
 function Card({ card, removeCreds }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
-    getDarkModeSettings(setIsDarkMode);
-  });
+    async function getAndSetIsDarkMode() {
+      try {
+        const value = await AsyncStorage.getItem("isDarkMode");
+        value == "true" ? setIsDarkMode(true) : setIsDarkMode(false);
+      } catch (e) {}
+    }
+    getAndSetIsDarkMode();
+  }, [isDarkMode]);
   const deleteTuple = (tupleId) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -43,10 +49,10 @@ function Card({ card, removeCreds }) {
         <Text style={!isDarkMode ? styles.textTitle : styles.darkTextTitle}>
           {card.name}
         </Text>
-        <Text style={!isDarkMode ? { color: "black" } : { color: "white" }}>
+        <Text style={!isDarkMode ? { color: "white" } : { color: "black" }}>
           Username: {card.email}
         </Text>
-        <Text style={!isDarkMode ? { color: "black" } : { color: "white" }}>
+        <Text style={!isDarkMode ? { color: "white" } : { color: "black" }}>
           Password: {card.password}
         </Text>
       </View>
@@ -55,7 +61,7 @@ function Card({ card, removeCreds }) {
           style={!isDarkMode ? styles.cardOption : styles.darkcardOption}
           onPress={() => editHandler(card.id)}
         >
-          <Text style={!isDarkMode ? { color: "black" } : { color: "white" }}>
+          <Text style={!isDarkMode ? { color: "white" } : { color: "black" }}>
             Edit
           </Text>
         </TouchableHighlight>
@@ -63,7 +69,7 @@ function Card({ card, removeCreds }) {
           style={!isDarkMode ? styles.cardOption : styles.darkcardOption}
           onPress={removeCardHandler}
         >
-          <Text style={!isDarkMode ? { color: "black" } : { color: "white" }}>
+          <Text style={!isDarkMode ? { color: "white" } : { color: "black" }}>
             Remove
           </Text>
         </TouchableHighlight>
@@ -75,8 +81,8 @@ function Card({ card, removeCreds }) {
 export default Card;
 
 const styles = StyleSheet.create({
-  textTitle: { fontSize: 24, fontWeight: "800" },
-  darkTextTitle: { fontSize: 24, fontWeight: "800", color: "white" },
+  textTitle: { fontSize: 24, fontWeight: "800", color: "white" },
+  darkTextTitle: { fontSize: 24, fontWeight: "800", color: "black" },
   card: {
     borderWidth: 2,
     borderRadius: 10,
@@ -87,6 +93,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    borderColor: "white",
   },
   darkCard: {
     borderWidth: 2,
@@ -119,9 +126,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 40,
     width: 65,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "black",
     borderWidth: 1,
     borderRadius: 10,
+    borderColor: "white",
   },
   darkcardOption: {
     display: "flex",

@@ -12,6 +12,7 @@ import AddCredential from "../components/AddCredential";
 import * as SQLite from "expo-sqlite";
 import Card from "../components/Card";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const db = SQLite.openDatabase("Credentials.db");
 
@@ -23,8 +24,10 @@ export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
     async function getAndSetIsDarkMode() {
-      const color = await SystemUI.getBackgroundColorAsync();
-      color == "#000000" ? setIsDarkMode(true) : setIsDarkMode(false);
+      try {
+        const value = await AsyncStorage.getItem("isDarkMode");
+        value == "true" ? setIsDarkMode(true) : setIsDarkMode(false);
+      } catch (e) {}
     }
     getAndSetIsDarkMode();
     db.transaction((tx) => {
