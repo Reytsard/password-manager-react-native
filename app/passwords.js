@@ -12,7 +12,6 @@ import AddCredential from "../components/AddCredential";
 import * as SQLite from "expo-sqlite";
 import Card from "../components/Card";
 import { router } from "expo-router";
-import { getDarkModeSettings } from "./setting";
 
 const db = SQLite.openDatabase("Credentials.db");
 
@@ -23,7 +22,11 @@ export default function Page() {
   const [searchList, setSearchList] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
-    getDarkModeSettings(setIsDarkMode);
+    async function getAndSetIsDarkMode() {
+      const color = await SystemUI.getBackgroundColorAsync();
+      color == "#000000" ? setIsDarkMode(true) : setIsDarkMode(false);
+    }
+    getAndSetIsDarkMode();
     db.transaction((tx) => {
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS Credentials (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL)",
@@ -35,7 +38,7 @@ export default function Page() {
       );
     });
     fetchCredentials();
-  }, []);
+  }, [isDarkMode]);
 
   const handleAddCredentials = (name, email, password) => {
     db.transaction((tx) => {

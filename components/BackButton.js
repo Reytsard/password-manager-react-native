@@ -5,7 +5,9 @@ import { StyleSheet, Text, TouchableWithoutFeedback } from "react-native";
 function BackButton({ isDarkMode }) {
   return (
     <TouchableWithoutFeedback onPress={() => router.navigate("/passwords")}>
-      <Text style={styles.DarkBackButton}>{"<"}</Text>
+      <Text style={isDarkMode ? styles.DarkBackButton : styles.backButton}>
+        {"<"}
+      </Text>
     </TouchableWithoutFeedback>
   );
 }

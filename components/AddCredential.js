@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,6 +11,14 @@ export default function AddCredential(props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  useEffect(() => {
+    async function getAndSetIsDarkMode() {
+      const color = await SystemUI.getBackgroundColorAsync();
+      console.log("password: ", color);
+      color == "#000000" ? setIsDarkMode(true) : setIsDarkMode(false);
+    }
+    getAndSetIsDarkMode();
+  }, []);
   const addCredential = () => {
     props.handleAddCredentials(name, email, password);
     setName("");
