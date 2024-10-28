@@ -12,7 +12,7 @@ import AddCredential from "../components/AddCredential";
 import * as SQLite from "expo-sqlite";
 import Card from "../components/Card";
 import { router } from "expo-router";
-import { getDarkModeSettings } from "./setting";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const db = SQLite.openDatabase("Credentials.db");
 
@@ -23,7 +23,13 @@ export default function Page() {
   const [searchList, setSearchList] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
-    getDarkModeSettings(setIsDarkMode);
+    async function getAndSetIsDarkMode() {
+      try {
+        const value = await AsyncStorage.getItem("isDarkMode");
+        value == "true" ? setIsDarkMode(true) : setIsDarkMode(false);
+      } catch (e) {}
+    }
+    getAndSetIsDarkMode();
     db.transaction((tx) => {
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS Credentials (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL)",
@@ -35,7 +41,7 @@ export default function Page() {
       );
     });
     fetchCredentials();
-  }, []);
+  }, [isDarkMode]);
 
   const handleAddCredentials = (name, email, password) => {
     db.transaction((tx) => {
@@ -71,7 +77,12 @@ export default function Page() {
   };
   const passwordCards = useMemo(() => {
     return passwords.map((card) => (
-      <Card card={card} removeCreds={() => removeCreds(card)} key={card.id} />
+      <Card
+        card={card}
+        removeCreds={() => removeCreds(card)}
+        key={card.id}
+        isDarkMode={isDarkMode}
+      />
     ));
   }, [passwords]);
 

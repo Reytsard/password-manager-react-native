@@ -12,8 +12,8 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { openDatabase } from "expo-sqlite";
 import * as SystemUI from "expo-system-ui";
+import { checkAndChangeSystemUIColor } from "./setting";
 const db = openDatabase("masterKey.db");
-SystemUI.setBackgroundColorAsync("black");
 
 export default function Page() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -43,7 +43,12 @@ export default function Page() {
       if (result == null) {
         await AsyncStorage.setItem("isDarkMode", isDarkMode + "");
       } else {
-        setIsDarkMode(result === "true");
+        if (result == "true") {
+          setIsDarkMode(result == "true");
+          SystemUI.setBackgroundColorAsync("black");
+        } else {
+          SystemUI.setBackgroundColorAsync("white");
+        }
       }
     } catch (e) {}
   };

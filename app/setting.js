@@ -9,13 +9,18 @@ import {
   View,
 } from "react-native";
 import BackButton from "../components/BackButton";
+import * as SystemUI from "expo-system-ui";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function Page() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
-    getDarkModeSettings(setIsDarkMode);
-  }, []);
+    async function getAndSetIsDarkMode() {
+      const color = await SystemUI.getBackgroundColorAsync();
+      color == "#000000" ? setIsDarkMode(true) : setIsDarkMode(false);
+    }
+    getAndSetIsDarkMode();
+  }, [isDarkMode]);
   return (
     <View style={!isDarkMode ? styles.container : styles.darkContainer}>
       <BackButton isDarkMode={isDarkMode} />
@@ -27,29 +32,29 @@ function Page() {
           Change Master Password
         </Text>
       </TouchableOpacity>
-      {/* <TouchableOpacity
+      <TouchableOpacity
         style={!isDarkMode ? styles.option : styles.darkOption}
-        onPress={() => {
-          changeDarkModeSetting(isDarkMode, setIsDarkMode);
-        }}
+        onPress={() => checkAndChangeSystemUIColor(setIsDarkMode)}
       >
         <Text style={!isDarkMode ? styles.font : styles.darkFont}>
           Dark Mode: {isDarkMode ? "ON" : "OFF"}
         </Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
     </View>
   );
 }
 
-export async function getDarkModeSettings(func) {
-  try {
-    const result = await AsyncStorage.getItem("isDarkMode");
-    if (result !== null) {
-      func(result === "true");
-      return result === "true";
-    }
-    return false;
-  } catch (e) {}
+export async function checkAndChangeSystemUIColor(setIsDarkMode) {
+  const color = await SystemUI.getBackgroundColorAsync();
+  if (color == "#000000") {
+    await SystemUI.setBackgroundColorAsync("white");
+    await AsyncStorage.setItem("isDarkMode", "false");
+    setIsDarkMode(false);
+  } else {
+    await SystemUI.setBackgroundColorAsync("black");
+    await AsyncStorage.setItem("isDarkMode", "true");
+    setIsDarkMode(true);
+  }
 }
 
 export default Page;

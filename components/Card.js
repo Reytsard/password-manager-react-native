@@ -3,15 +3,10 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
 import * as SQLite from "expo-sqlite";
 import { router } from "expo-router";
-import { getDarkModeSettings } from "../app/setting";
 
 const db = SQLite.openDatabase("Credentials.db");
 
-function Card({ card, removeCreds }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  useEffect(() => {
-    getDarkModeSettings(setIsDarkMode);
-  });
+function Card({ card, removeCreds, isDarkMode }) {
   const deleteTuple = (tupleId) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -75,7 +70,7 @@ function Card({ card, removeCreds }) {
 export default Card;
 
 const styles = StyleSheet.create({
-  textTitle: { fontSize: 24, fontWeight: "800" },
+  textTitle: { fontSize: 24, fontWeight: "800", color: "black" },
   darkTextTitle: { fontSize: 24, fontWeight: "800", color: "white" },
   card: {
     borderWidth: 2,
@@ -119,9 +114,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 40,
     width: 65,
-    backgroundColor: "#FFFFFF",
+    // backgroundColor: "black",
     borderWidth: 1,
     borderRadius: 10,
+    // borderColor: "white",
   },
   darkcardOption: {
     display: "flex",
