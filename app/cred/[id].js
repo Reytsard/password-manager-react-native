@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import BackButton from "../../components/BackButton";
-import { getDarkModeSettings } from "../setting";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const db = openDatabase("Credentials.db");
 
@@ -25,6 +25,15 @@ function Page() {
   //todo: create a verification that they will change it
 
   useEffect(() => {
+    async function getAndSetIsDarkMode() {
+      try {
+        const value = await AsyncStorage.getItem("isDarkMode");
+        value == "true" ? setIsDarkMode(true) : setIsDarkMode(false);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    getAndSetIsDarkMode();
     db.transaction((tx) =>
       tx.executeSql(
         "SELECT * FROM Credentials WHERE id = (?)",
@@ -37,8 +46,7 @@ function Page() {
         }
       )
     );
-    getDarkModeSettings(setIsDarkMode);
-  }, []);
+  }, [isDarkMode]);
   const updateCreds = () => {
     db.transaction((tx) =>
       tx.executeSql(
@@ -62,7 +70,7 @@ function Page() {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View>
+      <View style={styles.container}>
         <BackButton isDarkMode={isDarkMode} />
         <View style={isDarkMode ? styles.darkContainer : styles.container}>
           <TextInput
@@ -71,13 +79,17 @@ function Page() {
             style={isDarkMode ? styles.darkName : styles.name}
           />
           <View style={isDarkMode ? styles.darkInfos : styles.infos}>
-            <Text>Email/Username:</Text>
+            <Text style={isDarkMode ? { color: "white" } : { color: "black" }}>
+              Email/Username:
+            </Text>
             <TextInput
               value={username}
               onChangeText={(e) => setUsername(e)}
               style={isDarkMode ? styles.darkInfo : styles.info}
             />
-            <Text>Password:</Text>
+            <Text style={isDarkMode ? { color: "white" } : { color: "black" }}>
+              Password:
+            </Text>
             <TextInput
               value={password}
               onChangeText={(e) => setPassword(e)}
@@ -93,17 +105,13 @@ function Page() {
                           fontSize: 18,
                           color: "white",
                           borderColor: "white",
-                          borderWidth: 1,
                           padding: 20,
-                          borderRadius: 20,
                         }
                       : {
                           fontSize: 18,
                           color: "black",
                           borderColor: "black",
-                          borderWidth: 1,
                           padding: 20,
-                          borderRadius: 20,
                         }
                   }
                 >
@@ -129,6 +137,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    borderColor: "white",
   },
   darkSaveButton: {
     minWidth: 120,
@@ -182,16 +191,28 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
   },
   container: {
+    width: "100%",
     height: "100%",
+    paddingTop: 100,
+    paddingLeft: 10,
+    paddingRight: 10,
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
+    gap: 20,
   },
   darkContainer: {
     height: "100%",
+    width: "100%",
+    paddingTop: 100,
+    paddingLeft: 10,
+    paddingRight: 10,
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    flexDirection: "column",
+    gap: 20,
     backgroundColor: "black",
     color: "white",
   },
@@ -211,7 +232,6 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     color: "white",
     padding: 5,
-    borderWidth: 1,
     borderColor: "white",
   },
   backButton: {

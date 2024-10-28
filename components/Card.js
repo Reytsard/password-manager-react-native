@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
 import * as SQLite from "expo-sqlite";
 import { router } from "expo-router";
-import { getDarkModeSettings } from "../app/setting";
 
 const db = SQLite.openDatabase("Credentials.db");
 
