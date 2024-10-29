@@ -96,11 +96,17 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     borderColor: "white",
   },
-  creds: { display: "flex", flexDirection: "column", gap: 5 },
+  creds: {
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+    gap: 5,
+  },
   darkCreds: {
     display: "flex",
     flexDirection: "column",
     gap: 5,
+    flex: 1,
     color: "white",
   },
   cardOptions: {
