@@ -100,7 +100,12 @@ export default function Page() {
   };
   const searchListCards = useMemo(() => {
     return searchList.map((card) => (
-      <Card card={card} removeCreds={() => removeCreds(card)} key={card.id} />
+      <Card
+        isDarkMode={isDarkMode}
+        card={card}
+        removeCreds={() => removeCreds(card)}
+        key={card.id}
+      />
     ));
   }, [searchList]);
 
