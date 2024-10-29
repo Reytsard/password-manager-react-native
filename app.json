@@ -8,9 +8,9 @@
     "icon": "./assets/abby.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/abby.png",
+      "image": "./assets/abbyBack.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ca5cdd"
+      "backgroundColor": "#000000"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -19,7 +19,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/abby.png",
-        "backgroundColor": "#ca5cdd"
+        "backgroundColor": "#000000"
       },
       "package": "com.rrjdm.passwordmanager"
     },
