@@ -12,7 +12,6 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { openDatabase } from "expo-sqlite";
 import * as SystemUI from "expo-system-ui";
-import { checkAndChangeSystemUIColor } from "./setting";
 const db = openDatabase("masterKey.db");
 
 export default function Page() {
@@ -45,7 +44,7 @@ export default function Page() {
       } else {
         if (result == "true") {
           setIsDarkMode(result == "true");
-          SystemUI.setBackgroundColorAsync("black");
+          SystemUI.setBackgroundColorAsync("#141414");
         } else {
           SystemUI.setBackgroundColorAsync("white");
         }
@@ -155,7 +154,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 24,
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     color: "white",
   },
   main: {
@@ -169,7 +168,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     maxWidth: 960,
     marginHorizontal: "auto",
-    backgroundColor: "black",
+    backgroundColor: "#141414",
   },
   title: {
     textAlign: "center",
@@ -207,7 +206,7 @@ const styles = StyleSheet.create({
     borderColor: "white",
     borderWidth: 1,
     color: "#FFFFFF",
-    backgroundColor: "black",
+    backgroundColor: "#141414",
   },
   loginButton: {
     height: "36px",

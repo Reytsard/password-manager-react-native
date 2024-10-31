@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { StyleSheet, Text, TouchableWithoutFeedback } from "react-native";
 
 function BackButton({ isDarkMode }) {

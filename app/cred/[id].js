@@ -7,6 +7,7 @@ import {
   Text,
   TextInput,
   TouchableHighlight,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -20,6 +21,7 @@ function Page() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isConfirmingChanges, setIsConfirmingChanges] = useState(false);
 
   const { id } = useLocalSearchParams();
   //todo: create a verification that they will change it
@@ -73,52 +75,103 @@ function Page() {
       <View style={styles.container}>
         <BackButton isDarkMode={isDarkMode} />
         <View style={isDarkMode ? styles.darkContainer : styles.container}>
-          <TextInput
-            value={name}
-            onChangeText={(e) => setName(e)}
-            style={isDarkMode ? styles.darkName : styles.name}
-          />
+          {!isConfirmingChanges && (
+            <TextInput
+              value={name}
+              onChangeText={(e) => setName(e)}
+              style={isDarkMode ? styles.darkName : styles.name}
+            />
+          )}
           <View style={isDarkMode ? styles.darkInfos : styles.infos}>
-            <Text style={isDarkMode ? { color: "white" } : { color: "black" }}>
-              Email/Username:
-            </Text>
-            <TextInput
-              value={username}
-              onChangeText={(e) => setUsername(e)}
-              style={isDarkMode ? styles.darkInfo : styles.info}
-            />
-            <Text style={isDarkMode ? { color: "white" } : { color: "black" }}>
-              Password:
-            </Text>
-            <TextInput
-              value={password}
-              onChangeText={(e) => setPassword(e)}
-              style={isDarkMode ? styles.darkInfo : styles.info}
-            />
-            <View style={styles.options}>
-              <TouchableHighlight style={styles.saveButton}>
+            {!isConfirmingChanges && (
+              <Text
+                style={isDarkMode ? { color: "white" } : { color: "black" }}
+              >
+                Email/Username:
+              </Text>
+            )}
+            {!isConfirmingChanges && (
+              <TextInput
+                value={username}
+                onChangeText={(e) => setUsername(e)}
+                style={isDarkMode ? styles.darkInfo : styles.info}
+              />
+            )}
+            {!isConfirmingChanges && (
+              <Text
+                style={isDarkMode ? { color: "white" } : { color: "black" }}
+              >
+                Password:
+              </Text>
+            )}
+            {!isConfirmingChanges && (
+              <TextInput
+                value={password}
+                onChangeText={(e) => setPassword(e)}
+                style={isDarkMode ? styles.darkInfo : styles.info}
+              />
+            )}
+
+            {isConfirmingChanges ? (
+              <View style={styles.confirmChanges}>
                 <Text
-                  onPress={updateCreds}
                   style={
                     isDarkMode
-                      ? {
-                          fontSize: 18,
-                          color: "white",
-                          borderColor: "white",
-                          padding: 20,
-                        }
-                      : {
-                          fontSize: 18,
-                          color: "black",
-                          borderColor: "black",
-                          padding: 20,
-                        }
+                      ? { fontSize: 35, alignSelf: "center", color: "white" }
+                      : { fontSize: 35, alignSelf: "center", color: "black" }
                   }
                 >
-                  Save
+                  Confirm Changes
                 </Text>
-              </TouchableHighlight>
-            </View>
+                <TouchableOpacity
+                  style={isDarkMode ? styles.darkSaveButton : styles.saveButton}
+                  onPress={updateCreds}
+                >
+                  <Text
+                    style={isDarkMode ? { color: "white" } : { color: "black" }}
+                  >
+                    Confirm
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={isDarkMode ? styles.darkSaveButton : styles.saveButton}
+                  onPress={() => setIsConfirmingChanges(false)}
+                >
+                  <Text
+                    style={isDarkMode ? { color: "white" } : { color: "black" }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.options}>
+                <TouchableHighlight style={styles.saveButton}>
+                  <Text
+                    onPress={() => {
+                      setIsConfirmingChanges(true);
+                    }}
+                    style={
+                      isDarkMode
+                        ? {
+                            fontSize: 18,
+                            color: "white",
+                            borderColor: "white",
+                            padding: 20,
+                          }
+                        : {
+                            fontSize: 18,
+                            color: "black",
+                            borderColor: "black",
+                            padding: 20,
+                          }
+                    }
+                  >
+                    Save
+                  </Text>
+                </TouchableHighlight>
+              </View>
+            )}
           </View>
         </View>
       </View>
@@ -129,6 +182,12 @@ function Page() {
   //create a function that will show a modal that will ask if they want to change
 }
 const styles = StyleSheet.create({
+  confirmChanges: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 20,
+    justifyContent: "center",
+  },
   saveButton: {
     minWidth: 120,
     minHeight: 58,
@@ -147,7 +206,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     color: "white",
     borderColor: "white",
   },
@@ -158,7 +217,7 @@ const styles = StyleSheet.create({
   darkInfos: {
     width: "100%",
     padding: 50,
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     color: "white",
   },
   info: {
@@ -178,7 +237,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingLeft: 10,
     paddingRight: 10,
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     color: "white",
     padding: 5,
     borderWidth: 1,
@@ -213,7 +272,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     flexDirection: "column",
     gap: 20,
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     color: "white",
   },
   name: {
@@ -229,7 +288,7 @@ const styles = StyleSheet.create({
     height: 86,
     fontSize: 72,
     marginBottom: 30,
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     color: "white",
     padding: 5,
     borderColor: "white",
@@ -247,7 +306,7 @@ const styles = StyleSheet.create({
     left: 0,
     paddingLeft: 15,
     fontSize: 42,
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     color: "white",
   },
 });

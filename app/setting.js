@@ -1,13 +1,6 @@
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableNativeFeedback,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import BackButton from "../components/BackButton";
 import * as SystemUI from "expo-system-ui";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -17,7 +10,7 @@ function Page() {
   useEffect(() => {
     async function getAndSetIsDarkMode() {
       const color = await SystemUI.getBackgroundColorAsync();
-      color == "#000000" ? setIsDarkMode(true) : setIsDarkMode(false);
+      color == "#141414" ? setIsDarkMode(true) : setIsDarkMode(false);
     }
     getAndSetIsDarkMode();
   }, [isDarkMode]);
@@ -46,12 +39,13 @@ function Page() {
 
 export async function checkAndChangeSystemUIColor(setIsDarkMode) {
   const color = await SystemUI.getBackgroundColorAsync();
-  if (color == "#000000") {
+  console.log(color);
+  if (color == "#141414") {
     await SystemUI.setBackgroundColorAsync("white");
     await AsyncStorage.setItem("isDarkMode", "false");
     setIsDarkMode(false);
   } else {
-    await SystemUI.setBackgroundColorAsync("black");
+    await SystemUI.setBackgroundColorAsync("#141414");
     await AsyncStorage.setItem("isDarkMode", "true");
     setIsDarkMode(true);
   }
@@ -81,7 +75,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     flexDirection: "column",
     gap: 20,
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     color: "white",
   },
   option: {
@@ -101,7 +95,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     color: "white",
     borderColor: "white",
   },

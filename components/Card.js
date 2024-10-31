@@ -1,5 +1,4 @@
-import { openDatabase } from "expo-sqlite";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
 import * as SQLite from "expo-sqlite";
 import { router } from "expo-router";
@@ -93,7 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     borderColor: "white",
   },
   creds: {
@@ -120,7 +119,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 40,
     width: 65,
-    // backgroundColor: "black",
+    // backgroundColor:  "#141414",
     borderWidth: 1,
     borderRadius: 10,
     // borderColor: "white",
@@ -131,7 +130,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     height: 40,
     width: 65,
-    backgroundColor: "black",
+    backgroundColor: "#141414",
     color: "white",
     borderColor: "white",
     borderWidth: 1,
