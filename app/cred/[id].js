@@ -146,7 +146,9 @@ function Page() {
               </View>
             ) : (
               <View style={styles.options}>
-                <TouchableHighlight style={styles.saveButton}>
+                <TouchableHighlight
+                  style={isDarkMode ? styles.darkSaveButton : styles.saveButton}
+                >
                   <Text
                     onPress={() => {
                       setIsConfirmingChanges(true);
@@ -196,7 +198,6 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    borderColor: "black",
   },
   darkSaveButton: {
     minWidth: 120,
