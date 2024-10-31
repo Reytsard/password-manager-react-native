@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    borderColor: "white",
+    borderColor: "black",
   },
   darkSaveButton: {
     minWidth: 120,
