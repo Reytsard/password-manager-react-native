@@ -13,11 +13,15 @@ export default function AddCredential(props) {
   const [password, setPassword] = useState("");
   useEffect(() => {}, []);
   const addCredential = () => {
-    props.handleAddCredentials(name, email, password);
-    setName("");
-    setEmail("");
-    setPassword("");
-    props.setIsAddingCredential(false);
+    if (!(name == "" && email == "" && password == "")) {
+      props.handleAddCredentials(name, email, password);
+      setName("");
+      setEmail("");
+      setPassword("");
+      props.setIsAddingCredential(false);
+    } else {
+      //do something here so that it will show that there is no name, email, password
+    }
   };
   const cancelHandler = () => {
     setName("");
@@ -45,7 +49,6 @@ export default function AddCredential(props) {
         style={!props.isDarkMode ? styles.input : styles.darkInput}
       />
       <TextInput
-        secureTextEntry
         placeholder="Password"
         placeholderTextColor={!props.isDarkMode ? "black" : "white"}
         onChangeText={(e) => setPassword(e)}
@@ -90,7 +93,7 @@ const styles = StyleSheet.create({
     maxWidth: 920,
     height: 300,
     width: "100%",
-    backgroundColor:  "#141414",
+    backgroundColor: "#141414",
     color: "white",
   },
   header: {
@@ -117,7 +120,7 @@ const styles = StyleSheet.create({
     height: 50,
     paddingLeft: 10,
     paddingRight: 10,
-    backgroundColor:  "#141414",
+    backgroundColor: "#141414",
     color: "white",
     borderColor: "white",
   },
@@ -147,7 +150,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 40,
-    backgroundColor:  "#141414",
+    backgroundColor: "#141414",
     color: "white",
     borderColor: "white",
   },

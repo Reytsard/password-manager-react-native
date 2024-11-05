@@ -8,6 +8,7 @@ import {
   TouchableHighlight,
   View,
 } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AddCredential from "../components/AddCredential";
 import * as SQLite from "expo-sqlite";
 import Card from "../components/Card";
@@ -111,14 +112,29 @@ export default function Page() {
 
   return (
     <View style={!isDarkMode ? styles.container : styles.darkContainer}>
-      <TextInput
-        style={!isDarkMode ? styles.searchbar : styles.darkSearchbar}
-        placeholder="search"
-        placeholderTextColor={!isDarkMode ? "black" : "white"}
-        onChangeText={(e) => {
-          searchHandler(e, passwords);
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
         }}
-      />
+      >
+        <MaterialIcons
+          name="search"
+          size={26}
+          color={isDarkMode ? "white" : "black"}
+          style={{ height: 23, width: 25 }}
+        />
+        <TextInput
+          style={!isDarkMode ? styles.searchbar : styles.darkSearchbar}
+          placeholder="search"
+          placeholderTextColor={!isDarkMode ? "black" : "white"}
+          onChangeText={(e) => {
+            searchHandler(e, passwords);
+          }}
+        />
+      </View>
       <Text style={!isDarkMode ? styles.header : styles.darkHeader}>
         Credentials
       </Text>
@@ -235,8 +251,10 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingLeft: 10,
     paddingRight: 10,
+    paddingBottom: 50,
   },
   darkScrollView: {
+    paddingBottom: 50,
     width: "100%",
     paddingLeft: 10,
     paddingRight: 10,
@@ -246,14 +264,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    padding: 24,
+    paddingTop: 24,
+    paddingLeft: 24,
+    paddingRight: 24,
+    paddingBottom: 50,
   },
   darkContainer: {
     flex: 1,
     alignItems: "center",
-    padding: 24,
     backgroundColor: "#141414",
     color: "white",
+    paddingTop: 24,
+    paddingLeft: 24,
+    paddingRight: 24,
+    paddingBottom: 50,
   },
   main: {
     flex: 1,

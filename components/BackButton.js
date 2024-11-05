@@ -1,13 +1,17 @@
 import { router } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableWithoutFeedback } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { StyleSheet, TouchableWithoutFeedback } from "react-native";
 
 function BackButton({ isDarkMode }) {
   return (
     <TouchableWithoutFeedback onPress={() => router.replace("passwords")}>
-      <Text style={isDarkMode ? styles.DarkBackButton : styles.backButton}>
-        {"<"}
-      </Text>
+      <Ionicons
+        name="arrow-back-outline"
+        size={38}
+        color={isDarkMode ? "white" : "black"}
+        style={{ alignSelf: "flex-start", marginLeft: 40, marginBottom: 20 }}
+      />
     </TouchableWithoutFeedback>
   );
 }
