@@ -3,7 +3,7 @@
     "name": "password-manager",
     "slug": "password-manager",
     "scheme": "password-manager",
-    "version": "1.0.2",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
